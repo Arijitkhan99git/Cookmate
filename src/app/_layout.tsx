@@ -1,13 +1,17 @@
-import { useThemeColors } from "@/components/color-pallette";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useAtom } from "jotai";
 import { useEffect, useMemo } from "react";
 import { Platform, View } from "react-native";
+import { useThemeColors } from "../../constants/color-pallette";
 import { getStoredThemePreference, themeAtom } from "../../store/theme-store";
 
 export default function RootLayout() {
+  // Create a client
+  const queryClient = new QueryClient();
+
   const [, setTheme] = useAtom(themeAtom);
   const colors = useThemeColors();
 
@@ -47,17 +51,19 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <ThemeProvider value={navigationTheme}>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen name="(tabs)" />
-        </Stack>
-      </ThemeProvider>
-      <StatusBar style={colors.isDarkMode ? "light" : "dark"} />
-    </View>
+    <QueryClientProvider client={queryClient}>
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <ThemeProvider value={navigationTheme}>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name="(tabs)" />
+          </Stack>
+        </ThemeProvider>
+        <StatusBar style={colors.isDarkMode ? "light" : "dark"} />
+      </View>
+    </QueryClientProvider>
   );
 }

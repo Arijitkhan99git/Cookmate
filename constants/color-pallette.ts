@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import { useColorScheme } from "react-native";
-import { themeAtom } from "../../store/theme-store";
+import { themeAtom } from "../store/theme-store";
 
 export type ColorVariants =
   | "primary"
@@ -35,7 +35,7 @@ export const Colors = {
     // Text
     text: "#171717",
     textSecondary: "#6B6B6B",
-    mutedText: "#999999",
+    mutedText: "#6a6867ff",
     // Semantic
     secondary: "#FFF2E8",
     secondaryText: "#171717",
@@ -83,7 +83,7 @@ export const Colors = {
     // Text
     text: "#FFF8F2",
     textSecondary: "#C9BDB6",
-    mutedText: "#8E817A",
+    mutedText: "#b5aaa4ff",
     // Semantic
     secondary: "#211A17",
     secondaryText: "#FFF8F2",

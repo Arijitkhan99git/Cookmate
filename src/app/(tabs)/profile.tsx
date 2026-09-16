@@ -1,7 +1,7 @@
 import { AppText } from "@/components/AppText";
-import { useThemeColors } from "@/components/color-pallette";
 import { useAtom } from "jotai";
 import { StyleSheet, Switch, Text, View } from "react-native";
+import { useThemeColors } from "../../../constants/color-pallette";
 import {
   setStoredThemePreference,
   themeAtom,

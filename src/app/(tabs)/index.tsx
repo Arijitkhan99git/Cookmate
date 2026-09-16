@@ -1,6 +1,7 @@
-import { useThemeColors } from "@/components/color-pallette";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useThemeColors } from "../../../constants/color-pallette";
+import HomeCategories from "../../../features/home/components/HomeCategories";
 import HomeHeader from "../../../features/home/components/HomeHeader";
 import HomeSearch from "../../../features/home/components/HomeSearch";
 
@@ -22,6 +23,7 @@ export default function Index() {
         >
           <HomeHeader />
           <HomeSearch />
+          <HomeCategories />
         </ScrollView>
       </View>
     </SafeAreaView>

@@ -1,7 +1,7 @@
-import { useThemeColors } from "@/components/color-pallette";
 import { Search, Soup } from "lucide-react-native";
 import { useState } from "react";
 import { Platform, Pressable, StyleSheet, TextInput, View } from "react-native";
+import { useThemeColors } from "../../../constants/color-pallette";
 
 const HomeSearch = () => {
   const [inputText, setInputText] = useState("");

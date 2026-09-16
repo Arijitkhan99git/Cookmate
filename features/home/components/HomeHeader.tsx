@@ -1,7 +1,7 @@
 import { AppText } from "@/components/AppText";
-import { useThemeColors } from "@/components/color-pallette";
 import { Bell, Utensils } from "lucide-react-native";
 import { StyleSheet, Text, View } from "react-native";
+import { useThemeColors } from "../../../constants/color-pallette";
 
 const HomeHeader = () => {
   const { text, muted, primary } = useThemeColors();
