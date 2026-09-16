@@ -22,10 +22,23 @@ export const spacing = {
 
 export const components = {
   tabBar: {
-    height: spacing[18],
-    horizontalInset: spacing[5],
-    radius: spacing[8],
-    iconFrame: spacing[12],
-    itemPaddingVertical: spacing[2],
+    // Overall bar
+    height: 72,
+    horizontalInset: 20,
+    radius: 36,
+    // Active pill
+    pillRadius: 30,
+    pillPaddingH: 20,
+    pillPaddingV: 8,
+    // Icon
+    iconSize: 23,
+    // Label
+    labelSize: 11,
+    labelGap: 2,
+    // Shadow on active pill
+    shadowOffsetY: 4,
+    shadowOpacity: 0.18,
+    shadowRadius: 10,
+    elevation: 5,
   },
 } as const;

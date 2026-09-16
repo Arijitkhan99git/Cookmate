@@ -39,7 +39,7 @@ export const Colors = {
     // Semantic
     secondary: "#FFF2E8",
     secondaryText: "#171717",
-    muted: "#F6EFE9",
+    muted: "#ece9e7ff",
     popover: "#FFFFFF",
     popoverText: "#171717",
     // Feedback
