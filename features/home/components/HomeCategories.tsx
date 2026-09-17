@@ -60,7 +60,7 @@ const HomeCategories = () => {
           renderItem={({ item }) => <CategoryItem item={item} />}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{
-            paddingBottom: 120,
+            paddingBottom: 10,
             gap: 16,
           }}
         />

@@ -29,7 +29,7 @@ export const Colors = {
     primary: "#FF5A1F",
     primaryText: "#FFFFFF",
     orangeGlow: "#FF6A2A",
-    orangeTint: "#FF5A1F",
+    orangeTint: "#c9582fff",
     brandOrange: "#FF5A1F",
     brandOrangeGlow: "#FF6A2A",
     // Text
@@ -77,7 +77,7 @@ export const Colors = {
     primary: "#FF6A2A",
     primaryText: "#FFFFFF",
     orangeGlow: "#FF6A2A",
-    orangeTint: "#FF5A1F",
+    orangeTint: "#df724aff",
     brandOrange: "#FF6A2A",
     brandOrangeGlow: "#FF6A2A",
     // Text
