@@ -86,7 +86,7 @@ export const Colors = {
     mutedText: "#b5aaa4ff",
     // Semantic
     secondary: "#211A17",
-    secondaryText: "#FFF8F2",
+    secondaryText: "#c4b09eff",
     muted: "#30251F",
     popover: "#29201C",
     popoverText: "#FFF8F2",

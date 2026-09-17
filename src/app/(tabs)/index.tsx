@@ -20,6 +20,7 @@ export default function Index() {
           contentContainerStyle={{
             padding: 20,
             rowGap: 30,
+            paddingBottom: 100,
           }}
         >
           <HomeHeader />
