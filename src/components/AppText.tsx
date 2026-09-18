@@ -8,6 +8,7 @@ export function AppText({ style, ...props }: TextProps) {
         {
           fontFamily: fonts.regular,
           includeFontPadding: false,
+          fontSize: 13,
           // textAlignVertical: "center",
         },
         style,
