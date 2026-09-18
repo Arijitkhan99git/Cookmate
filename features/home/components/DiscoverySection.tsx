@@ -1,26 +1,59 @@
 import { AppText } from "@/components/AppText";
-import { Flame } from "lucide-react-native";
-import { StyleSheet, View } from "react-native";
+import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
+import { Flame, Timer } from "lucide-react-native";
+import { Pressable, StyleSheet, View } from "react-native";
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+} from "react-native-reanimated";
 import { useFetchRandomMeal } from "../../../api/hooks/useRandomMeal";
 import { useThemeColors } from "../../../constants/color-pallette";
 import { fonts } from "../../../constants/typography";
 import { SectionHeading } from "./SectionHeading";
 
-const DiscoverySection = () => {
-  const { orangeTint, isDarkMode } = useThemeColors();
-  const { data } = useFetchRandomMeal();
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-  //   console.log(data);
+const DiscoverySection = () => {
+  const {
+    card,
+    orangeTint,
+    primary,
+    isDarkMode,
+    text: headingColor,
+    secondaryText,
+    surfaceHigh,
+  } = useThemeColors();
+
+  const { data } = useFetchRandomMeal();
+  const meal = data?.meals?.[0];
+
+  const scale = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const gradientColors = isDarkMode
+    ? ([card, "#3a1f0eff"] as const)
+    : (["#fff8f4ff", "#ffe0c8ff"] as const);
+
+  const handleRandomCook = ({ mealId }: { mealId: string }) => {
+    console.log(mealId);
+  };
 
   return (
     <View style={styles.container}>
+      {/* ── Section Header ── */}
       <View style={styles.titleRow}>
         <View style={{ gap: 0 }}>
           <AppText
             style={{
               color: orangeTint,
               fontSize: 11,
+              fontFamily: fonts.medium,
               textTransform: "uppercase",
+              letterSpacing: 1,
             }}
           >
             Trending Right Now
@@ -29,7 +62,7 @@ const DiscoverySection = () => {
         </View>
 
         <View style={[styles.badge, { backgroundColor: "#d2ae66ff" }]}>
-          <Flame size={15} color="#2a2929ff" />
+          <Flame size={13} color="#2a2929ff" />
           <AppText
             style={{
               fontFamily: fonts.medium,
@@ -42,8 +75,108 @@ const DiscoverySection = () => {
         </View>
       </View>
 
-      {/* Random Meal Card */}
-      <View></View>
+      {/* ── Random Meal Card ── */}
+      <LinearGradient
+        colors={gradientColors}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[
+          styles.card,
+          { shadowColor: isDarkMode ? "#000000" : "#c17a4bff" },
+        ]}
+      >
+        {/* Circular meal image */}
+        <View style={styles.imageWrapper}>
+          <Image
+            source={{ uri: meal?.strMealThumb }}
+            style={styles.mealImage}
+            contentFit="cover"
+          />
+        </View>
+
+        {/* Right content */}
+        <View style={styles.content}>
+          {/* Level pill + time */}
+          <View style={styles.metaRow}>
+            <View
+              style={[
+                styles.levelPill,
+                { backgroundColor: isDarkMode ? surfaceHigh : "#e8d5c4ff" },
+              ]}
+            >
+              <AppText
+                style={{
+                  fontFamily: fonts.semibold,
+                  fontSize: 11,
+                  color: orangeTint,
+                }}
+              >
+                Easy
+              </AppText>
+            </View>
+            <View style={styles.timeRow}>
+              <Timer size={13} color={secondaryText} />
+              <AppText
+                style={{
+                  fontFamily: fonts.medium,
+                  fontSize: 12,
+                  color: secondaryText,
+                }}
+              >
+                25 min
+              </AppText>
+            </View>
+          </View>
+
+          {/* Meal title from API */}
+          <AppText
+            style={{
+              fontFamily: fonts.bold,
+              fontSize: 20,
+              color: headingColor,
+              lineHeight: 26,
+              marginTop: 2,
+            }}
+            numberOfLines={2}
+          >
+            {meal?.strMeal ?? "Loading…"}
+          </AppText>
+
+          {/* Kcal · Protein */}
+          <View style={styles.statsRow}>
+            <AppText style={{ fontSize: 13, color: secondaryText }}>
+              380 kcal
+            </AppText>
+            <View style={[styles.dot, { backgroundColor: secondaryText }]} />
+            <AppText style={{ fontSize: 13, color: secondaryText }}>
+              High Protein
+            </AppText>
+          </View>
+
+          {/* CTA Button */}
+          <AnimatedPressable
+            style={[styles.ctaBtn, { backgroundColor: primary }, animatedStyle]}
+            onPressIn={() => {
+              scale.value = withTiming(0.94, { duration: 100 });
+            }}
+            onPressOut={() => {
+              scale.value = withTiming(1, { duration: 150 });
+            }}
+            onPress={() => handleRandomCook({ mealId: meal?.idMeal ?? "" })}
+            hitSlop={6}
+          >
+            <AppText
+              style={{
+                fontFamily: fonts.semibold,
+                fontSize: 14,
+                color: "#fff",
+              }}
+            >
+              Let's cook 🍳
+            </AppText>
+          </AnimatedPressable>
+        </View>
+      </LinearGradient>
     </View>
   );
 };
@@ -54,19 +187,86 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "column",
     gap: 5,
+    marginBottom: 24,
   },
   titleRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     gap: 15,
-    marginBottom: 15,
+    marginBottom: 12,
   },
   badge: {
     flexDirection: "row",
-    gap: 2,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    alignItems: "center",
+    gap: 3,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 50,
+  },
+  // ── Card ──────────────────────────────────────────────────────────────
+  card: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 22,
+    paddingVertical: 16,
+    paddingHorizontal: 14,
+    gap: 14,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.22,
+    shadowRadius: 14,
+    elevation: 6,
+  },
+  // ── Image ─────────────────────────────────────────────────────────────
+  imageWrapper: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    overflow: "hidden",
+    flexShrink: 0,
+  },
+  mealImage: {
+    width: "100%",
+    height: "100%",
+  },
+  // ── Right content ──────────────────────────────────────────────────────
+  content: {
+    flex: 1,
+    flexDirection: "column",
+    gap: 4,
+  },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  levelPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 50,
+  },
+  timeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  statsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 2,
+  },
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    opacity: 0.5,
+  },
+  ctaBtn: {
+    alignSelf: "flex-start",
+    marginTop: 10,
+    paddingHorizontal: 18,
+    paddingVertical: 11,
     borderRadius: 50,
   },
 });
