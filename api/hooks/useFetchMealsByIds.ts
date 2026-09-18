@@ -17,9 +17,10 @@ export function useFetchMealsByIds(ids: string[]) {
 
   const isLoading = queries.some((q) => q.isLoading);
   const isError = queries.some((q) => q.isError);
+  const error = queries.find((q) => q.error)?.error ?? null;
 
   // Flatten all meals from all query results into a single array
   const meals: Meal[] = queries.flatMap((q) => q.data?.meals ?? []);
 
-  return { meals, isLoading, isError };
+  return { meals, isLoading, isError, error };
 }

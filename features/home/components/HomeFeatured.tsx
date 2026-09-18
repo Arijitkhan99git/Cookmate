@@ -1,14 +1,23 @@
 import { AppText } from "@/components/AppText";
-import { ArrowRight } from "lucide-react-native";
-import { Dimensions, FlatList, StyleSheet, View } from "react-native";
+import { AlertCircle, ArrowRight, RefreshCw } from "lucide-react-native";
+import {
+    Dimensions,
+    FlatList,
+    Pressable,
+    StyleSheet,
+    View,
+} from "react-native";
 import { useFetchMealsByArea } from "../../../api/hooks/useFetchMealByArea";
 import { useFetchMealsByIds } from "../../../api/hooks/useFetchMealsByIds";
 import { useThemeColors } from "../../../constants/color-pallette";
+import { fonts } from "../../../constants/typography";
+import { FeaturedSkeletonRow } from "../skeletons/FeaturedSkeleton";
 import FeaturedCard from "./FeaturedCard";
 import { SectionHeading } from "./SectionHeading";
 
 const HomeFeatured = () => {
-  const { orangeTint, isDarkMode } = useThemeColors();
+  const { orangeTint, isDarkMode, danger, secondaryText, surfaceSecondary } =
+    useThemeColors();
 
   const swipeTint = isDarkMode ? "#dc956dff" : "#8d6046ff";
 
@@ -31,7 +40,15 @@ const HomeFeatured = () => {
 
   const featuredMealIds = featuredMeals.map((meal) => meal.idMeal);
 
-  const { meals, isLoading } = useFetchMealsByIds(featuredMealIds);
+  // Phase 1: area queries are still fetching → IDs not available yet
+  const feturedLoading = italianLoading || chineseLoading || indianLoading;
+
+  const { meals, isLoading, isError, error } =
+    useFetchMealsByIds(featuredMealIds);
+
+  // Single flag covering both loading phases:
+  // Phase 1 = area queries, Phase 2 = per-meal detail queries
+  const showLoading = feturedLoading || isLoading;
 
   //   console.log(meals, isLoading);
 
@@ -67,19 +84,66 @@ const HomeFeatured = () => {
         </View>
       </View>
 
-      <View>
-        <FlatList
-          data={meals}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.idMeal}
-          renderItem={({ item }) => <FeaturedCard item={item} />}
-          snapToInterval={CARD_WIDTH + gap}
-          decelerationRate="fast"
-          snapToAlignment="start"
-          scrollEventThrottle={16}
-        />
-      </View>
+      {/* ── Loading: shimmer skeletons ── */}
+      {showLoading && <FeaturedSkeletonRow count={3} />}
+
+      {/* ── Error state ── */}
+      {isError && !showLoading && (
+        <View style={[styles.errorBox, { backgroundColor: surfaceSecondary }]}>
+          <AlertCircle size={22} color={danger} />
+          <View style={{ flex: 1, gap: 3 }}>
+            <AppText
+              style={{
+                fontFamily: fonts.semibold,
+                color: danger,
+                fontSize: 13,
+              }}
+            >
+              Couldn't load meals
+            </AppText>
+            <AppText
+              style={{ color: secondaryText, fontSize: 12 }}
+              numberOfLines={2}
+            >
+              {(error as Error)?.message ??
+                "Something went wrong. Please try again."}
+            </AppText>
+          </View>
+          <Pressable
+            onPress={() => {}}
+            style={[styles.retryBtn, { backgroundColor: danger }]}
+            hitSlop={8}
+          >
+            <RefreshCw size={13} color="#fff" />
+            <AppText
+              style={{
+                fontFamily: fonts.semibold,
+                fontSize: 12,
+                color: "#fff",
+              }}
+            >
+              Retry
+            </AppText>
+          </Pressable>
+        </View>
+      )}
+
+      {/* ── Data ── */}
+      {!showLoading && !isError && (
+        <View>
+          <FlatList
+            data={meals}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item.idMeal}
+            renderItem={({ item }) => <FeaturedCard item={item} />}
+            snapToInterval={CARD_WIDTH + gap}
+            decelerationRate="fast"
+            snapToAlignment="start"
+            scrollEventThrottle={16}
+          />
+        </View>
+      )}
     </View>
   );
 };
@@ -97,5 +161,22 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 15,
     marginBottom: 15,
+  },
+  // ── Error ──────────────────────────────────────────────
+  errorBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+  retryBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 50,
   },
 });
