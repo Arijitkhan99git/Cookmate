@@ -4,13 +4,18 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Bookmark, Play, Timer } from "lucide-react-native";
 import { useState } from "react";
 import {
-    Dimensions,
-    Platform,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  Dimensions,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { Meal } from "../../../api/model/fetchMealById-model";
 import { useThemeColors } from "../../../constants/color-pallette";
 import { fonts } from "../../../constants/typography";
@@ -39,6 +44,44 @@ const FeaturedCard = ({ item }: MealCardProps) => {
 
   const handleCook = ({ mealId }: { mealId: string }) => {
     console.log(mealId);
+  };
+
+  const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+  const DetailsButton = () => {
+    const scale = useSharedValue(1);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+    }));
+
+    return (
+      <AnimatedPressable
+        style={[styles.detailsBtn, { backgroundColor: primary }, animatedStyle]}
+        onPressIn={() => {
+          scale.value = withTiming(0.92, { duration: 100 });
+        }}
+        onPressOut={() => {
+          scale.value = withTiming(1, { duration: 150 });
+        }}
+        onPress={() => handleCook({ mealId: item.idMeal })}
+        hitSlop={8}
+      >
+        <AppText style={{ color: "#fff", fontFamily: fonts.medium }}>
+          Let's cook
+        </AppText>
+        <View
+          style={{
+            backgroundColor: isDarkMode ? headingColor : card,
+            padding: 5,
+            borderRadius: 50,
+            overflow: "hidden",
+          }}
+        >
+          <Play size={15} color={primary} />
+        </View>
+      </AnimatedPressable>
+    );
   };
 
   return (
@@ -182,32 +225,7 @@ const FeaturedCard = ({ item }: MealCardProps) => {
               </AppText>
             </View>
 
-            <Pressable
-              style={({ pressed }) => [
-                styles.detailsBtn,
-                {
-                  backgroundColor: primary,
-                  opacity: pressed ? 0.7 : 1,
-                  transform: [{ scale: pressed ? 0.92 : 1 }],
-                },
-              ]}
-              onPress={() => handleCook({ mealId: item.idMeal })}
-              hitSlop={8}
-            >
-              <AppText style={{ color: "#fff", fontFamily: fonts.medium }}>
-                Let's cook
-              </AppText>
-              <View
-                style={{
-                  backgroundColor: isDarkMode ? headingColor : card,
-                  padding: 5,
-                  borderRadius: 50,
-                  overflow: "hidden",
-                }}
-              >
-                <Play size={15} color={primary} />
-              </View>
-            </Pressable>
+            <DetailsButton />
           </View>
         </View>
       </View>
@@ -244,7 +262,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.35)",
+    backgroundColor: "rgba(0,0,0,0.40)",
   },
   mainImage: {
     width: MAIN_IMAGE_WIDTH,
