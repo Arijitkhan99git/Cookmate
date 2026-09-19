@@ -5,6 +5,7 @@ import DiscoverySection from "../../../features/home/components/DiscoverySection
 import HomeCategories from "../../../features/home/components/HomeCategories";
 import HomeFeatured from "../../../features/home/components/HomeFeatured";
 import HomeHeader from "../../../features/home/components/HomeHeader";
+import HomeInspirations from "../../../features/home/components/HomeInspirations";
 import HomeSearch from "../../../features/home/components/HomeSearch";
 
 export default function Index() {
@@ -29,6 +30,7 @@ export default function Index() {
           <HomeCategories />
           <HomeFeatured />
           <DiscoverySection />
+          <HomeInspirations />
         </ScrollView>
       </View>
     </SafeAreaView>
