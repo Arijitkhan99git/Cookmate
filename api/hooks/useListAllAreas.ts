@@ -53,5 +53,8 @@ export function useFetchMealsByAreasLists(areas: CountryMeal[]) {
     return []; // skip loading / empty queries — no undefined pollution
   });
 
-  return { areaData, isLoading, isError, error };
+  const isRefetching = queries.some((q) => q.isRefetching);
+  const refetch = () => queries.forEach((q) => q.refetch());
+
+  return { areaData, isLoading, isError, error, refetch, isRefetching };
 }

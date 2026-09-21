@@ -1,29 +1,17 @@
 import { AppText } from "@/components/AppText";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import {
-    useFetchAllAreaList,
-    useFetchMealsByAreasLists,
-} from "../../../api/hooks/useListAllAreas";
+import { AlertCircle, RefreshCw } from "lucide-react-native";
+import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import { useFetchMealsByAreasLists } from "../../../api/hooks/useListAllAreas";
 import { useThemeColors } from "../../../constants/color-pallette";
+import { fonts } from "../../../constants/typography";
 import { VALID_MEAL_AREAS } from "../constants/validMealAreas";
 import { useRandomValidAreas } from "../hooks/useRandomAreas";
+import { AreaCardSkeleton } from "../skeletons/HomeAreaCardsSkeletons";
 import AreaCuisinesHomeCard from "./AreaCuisinesHomeCard";
 import { SectionHeading } from "./SectionHeading";
 
 const HomeAreaList = () => {
-  const { primary, danger, secondaryText, surfaceSecondary, muted } =
-    useThemeColors();
-
-  const {
-    data: areaList,
-    isLoading,
-    isError,
-    error,
-    refetch,
-    isRefetching,
-  } = useFetchAllAreaList();
-
-  //   const randomAreas = useRandomAreas(areaList?.meals || [], 10, 10);
+  const { primary, danger, secondaryText, surfaceSecondary } = useThemeColors();
 
   const randomAreas = useRandomValidAreas(VALID_MEAL_AREAS, 10);
 
@@ -32,23 +20,72 @@ const HomeAreaList = () => {
     isLoading: isMealsLoading,
     isError: isMealsError,
     error: mealsError,
+    refetch,
+    isRefetching,
   } = useFetchMealsByAreasLists(randomAreas);
 
-  if (isLoading) {
-    return <Text>Loading</Text>;
-  }
+  return (
+    <View style={styles.container}>
+      {/* ── Header ── */}
+      <View style={styles.titleRow}>
+        <SectionHeading>Explore Cuisines</SectionHeading>
+        <Pressable onPress={() => {}}>
+          <AppText style={{ color: primary, fontSize: 13 }}>Explore</AppText>
+        </Pressable>
+      </View>
 
-  if (!isError && !isLoading) {
-    return (
-      <View style={styles.container}>
-        {/* ── Header ── */}
-        <View style={styles.titleRow}>
-          <SectionHeading>Explore Cuisines</SectionHeading>
-          <Pressable onPress={() => {}}>
-            <AppText style={{ color: primary, fontSize: 13 }}>Explore</AppText>
+      {/* ── Loading: shimmer skeletons ── */}
+      {isMealsLoading && (
+        <View style={styles.skeletonRow}>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <AreaCardSkeleton key={i} />
+          ))}
+        </View>
+      )}
+
+      {/* ── Error state ── */}
+      {isMealsError && !isMealsLoading && (
+        <View style={[styles.errorBox, { backgroundColor: surfaceSecondary }]}>
+          <AlertCircle size={22} color={danger} />
+          <View style={{ flex: 1, gap: 2 }}>
+            <AppText
+              style={{
+                fontFamily: fonts.semibold,
+                color: danger,
+                fontSize: 13,
+              }}
+            >
+              Couldn't load cuisines
+            </AppText>
+            <AppText
+              style={{ color: secondaryText, fontSize: 12 }}
+              numberOfLines={2}
+            >
+              {(mealsError as Error)?.message ??
+                "Something went wrong. Please try again."}
+            </AppText>
+          </View>
+          <Pressable
+            onPress={() => refetch()}
+            style={[styles.retryBtn, { backgroundColor: danger }]}
+            hitSlop={8}
+          >
+            <RefreshCw size={13} color="#fff" />
+            <AppText
+              style={{
+                fontFamily: fonts.semibold,
+                fontSize: 12,
+                color: "#fff",
+              }}
+            >
+              {isRefetching ? "Retrying…" : "Retry"}
+            </AppText>
           </Pressable>
         </View>
+      )}
 
+      {/* ── Data ── */}
+      {!isMealsLoading && !isMealsError && (
         <FlatList
           data={areaData}
           horizontal
@@ -58,9 +95,9 @@ const HomeAreaList = () => {
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingBottom: 10, gap: 16 }}
         />
-      </View>
-    );
-  }
+      )}
+    </View>
+  );
 };
 
 export default HomeAreaList;
@@ -75,5 +112,28 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 15,
     marginBottom: 16,
+  },
+  // ── Skeleton ──────────────────────────────────────────
+  skeletonRow: {
+    flexDirection: "row",
+    gap: 16,
+    paddingBottom: 10,
+  },
+  // ── Error ─────────────────────────────────────────────
+  errorBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+  retryBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 50,
   },
 });
