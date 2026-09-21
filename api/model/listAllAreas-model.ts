@@ -1,7 +1,7 @@
 export interface ListAllAreasResponse {
-  meals: Meal[];
+  meals: CountryMeal[];
 }
-interface Meal {
+export interface CountryMeal {
   strArea: string;
   strCountry: string;
 }

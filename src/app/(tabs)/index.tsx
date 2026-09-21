@@ -2,6 +2,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeColors } from "../../../constants/color-pallette";
 import DiscoverySection from "../../../features/home/components/DiscoverySection";
+import HomeAreaList from "../../../features/home/components/HomeAreaList";
 import HomeCategories from "../../../features/home/components/HomeCategories";
 import HomeFeatured from "../../../features/home/components/HomeFeatured";
 import HomeHeader from "../../../features/home/components/HomeHeader";
@@ -31,6 +32,7 @@ export default function Index() {
           <HomeFeatured />
           <DiscoverySection />
           <HomeInspirations />
+          <HomeAreaList />
         </ScrollView>
       </View>
     </SafeAreaView>
