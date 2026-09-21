@@ -6,6 +6,7 @@ import {
 } from "../../../api/hooks/useListAllAreas";
 import { useThemeColors } from "../../../constants/color-pallette";
 import { VALID_MEAL_AREAS } from "../constants/validMealAreas";
+import { useRandomValidAreas } from "../hooks/useRandomAreas";
 import AreaCuisinesHomeCard from "./AreaCuisinesHomeCard";
 import { SectionHeading } from "./SectionHeading";
 
@@ -24,7 +25,7 @@ const HomeAreaList = () => {
 
   //   const randomAreas = useRandomAreas(areaList?.meals || [], 10, 10);
 
-  const randomAreas = VALID_MEAL_AREAS.slice(0, 10);
+  const randomAreas = useRandomValidAreas(VALID_MEAL_AREAS, 10);
 
   const {
     areaData,
