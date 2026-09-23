@@ -1,11 +1,11 @@
 import { AppText } from "@/components/AppText";
 import { AlertCircle, ArrowRight, RefreshCw } from "lucide-react-native";
 import {
-    Dimensions,
-    FlatList,
-    Pressable,
-    StyleSheet,
-    View,
+  Dimensions,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  View,
 } from "react-native";
 import { useFetchMealsByArea } from "../../../api/hooks/useFetchMealByArea";
 import { useFetchMealsByIds } from "../../../api/hooks/useFetchMealsByIds";
@@ -15,7 +15,7 @@ import { FeaturedSkeletonRow } from "../skeletons/FeaturedSkeleton";
 import FeaturedCard from "./FeaturedCard";
 import { SectionHeading } from "./SectionHeading";
 
-const HomeFeatured = () => {
+const HomePopularLunch = () => {
   const { orangeTint, isDarkMode, danger, secondaryText, surfaceSecondary } =
     useThemeColors();
 
@@ -148,7 +148,7 @@ const HomeFeatured = () => {
   );
 };
 
-export default HomeFeatured;
+export default HomePopularLunch;
 
 const styles = StyleSheet.create({
   container: {

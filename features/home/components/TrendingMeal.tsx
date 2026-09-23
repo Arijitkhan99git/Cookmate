@@ -16,7 +16,7 @@ import { SectionHeading } from "./SectionHeading";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-const DiscoverySection = () => {
+const TrendingMeal = () => {
   const {
     card,
     orangeTint,
@@ -235,7 +235,7 @@ const DiscoverySection = () => {
   );
 };
 
-export default DiscoverySection;
+export default TrendingMeal;
 
 const styles = StyleSheet.create({
   container: {

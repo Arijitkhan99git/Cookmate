@@ -1,16 +1,16 @@
 import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeColors } from "../../../constants/color-pallette";
-import DiscoverySection from "../../../features/home/components/DiscoverySection";
 import HomeAreaList from "../../../features/home/components/HomeAreaList";
 import HomeCategories from "../../../features/home/components/HomeCategories";
-import HomeFeatured from "../../../features/home/components/HomeFeatured";
 import HomeHeader from "../../../features/home/components/HomeHeader";
 import HomeInspirations from "../../../features/home/components/HomeInspirations";
+import HomePopularLunch from "../../../features/home/components/HomePopularLunch";
 import HomeSearch from "../../../features/home/components/HomeSearch";
+import TrendingMeal from "../../../features/home/components/TrendingMeal";
 
 export default function Index() {
-  const { background, text } = useThemeColors();
+  const { background } = useThemeColors();
   const colors = useThemeColors();
 
   const isDark = colors.isDarkMode;
@@ -29,8 +29,8 @@ export default function Index() {
           <HomeHeader />
           <HomeSearch />
           <HomeCategories />
-          <HomeFeatured />
-          <DiscoverySection />
+          <HomePopularLunch />
+          <TrendingMeal />
           <HomeInspirations />
           <HomeAreaList />
         </ScrollView>

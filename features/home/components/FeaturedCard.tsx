@@ -1,6 +1,7 @@
 import { AppText } from "@/components/AppText";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import { Bookmark, Play, Timer } from "lucide-react-native";
 import { useState } from "react";
 import {
@@ -29,8 +30,42 @@ const IMAGE_SECTION_HEIGHT = 220;
 const MAIN_IMAGE_HEIGHT = 190;
 const MAIN_IMAGE_WIDTH = 260;
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+// ── Decorative only — card Pressable handles navigation ──
+const DetailsButton = () => {
+  const { card, text: headingColor, primary, isDarkMode } = useThemeColors();
+
+  const scale = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <AnimatedPressable
+      style={[styles.detailsBtn, { backgroundColor: primary }, animatedStyle]}
+      pointerEvents="none"
+    >
+      <AppText style={{ color: "#fff", fontFamily: fonts.medium }}>
+        Let's cook
+      </AppText>
+      <View
+        style={{
+          backgroundColor: isDarkMode ? headingColor : card,
+          padding: 5,
+          borderRadius: 50,
+          overflow: "hidden",
+        }}
+      >
+        <Play size={15} color={primary} />
+      </View>
+    </AnimatedPressable>
+  );
+};
+
 const FeaturedCard = ({ item }: MealCardProps) => {
   const [saved, setSaved] = useState(false);
+  const router = useRouter();
 
   const {
     card,
@@ -42,54 +77,25 @@ const FeaturedCard = ({ item }: MealCardProps) => {
     surfaceHigh,
   } = useThemeColors();
 
-  const handleCook = ({ mealId }: { mealId: string }) => {
-    console.log(mealId);
-  };
-
-  const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-  const DetailsButton = () => {
-    const scale = useSharedValue(1);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-      transform: [{ scale: scale.value }],
-    }));
-
-    return (
-      <AnimatedPressable
-        style={[styles.detailsBtn, { backgroundColor: primary }, animatedStyle]}
-        onPressIn={() => {
-          scale.value = withTiming(0.92, { duration: 100 });
-        }}
-        onPressOut={() => {
-          scale.value = withTiming(1, { duration: 150 });
-        }}
-        onPress={() => handleCook({ mealId: item.idMeal })}
-        hitSlop={8}
-      >
-        <AppText style={{ color: "#fff", fontFamily: fonts.medium }}>
-          Let's cook
-        </AppText>
-        <View
-          style={{
-            backgroundColor: isDarkMode ? headingColor : card,
-            padding: 5,
-            borderRadius: 50,
-            overflow: "hidden",
-          }}
-        >
-          <Play size={15} color={primary} />
-        </View>
-      </AnimatedPressable>
-    );
-  };
+  const cardScale = useSharedValue(1);
+  const cardAnimStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: cardScale.value }],
+  }));
 
   return (
-    <View
+    <AnimatedPressable
       style={[
         styles.shadowWrapper,
         { shadowColor: isDarkMode ? "#000000" : "#b48e7bff" },
+        cardAnimStyle,
       ]}
+      onPressIn={() => {
+        cardScale.value = withTiming(0.97, { duration: 120 });
+      }}
+      onPressOut={() => {
+        cardScale.value = withTiming(1, { duration: 180 });
+      }}
+      onPress={() => router.push(`/meal/${item.idMeal}`)}
     >
       <View
         style={[
@@ -141,7 +147,6 @@ const FeaturedCard = ({ item }: MealCardProps) => {
             hitSlop={8}
           >
             <Bookmark
-              // name={saved ? "bookmark" : "bookmark-outline"}
               size={18}
               stroke={saved ? primary : headingColor}
               fill={saved ? primary : "none"}
@@ -229,7 +234,7 @@ const FeaturedCard = ({ item }: MealCardProps) => {
           </View>
         </View>
       </View>
-    </View>
+    </AnimatedPressable>
   );
 };
 
