@@ -103,7 +103,6 @@ const MealIngredients = ({ mealDetails }: MealIngredientsProps) => {
   const {
     text: textColor,
     primary,
-    card,
     secondaryText,
     isDarkMode,
     surfaceSecondary,

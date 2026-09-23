@@ -14,6 +14,7 @@ import { useGenericShadow } from "../../../constants/genericShadowStyle";
 import { fonts } from "../../../constants/typography";
 import { MealBlogLinkCard } from "../../../features/mealDeatils/MealBlogLinkCard";
 import MealIngredients from "../../../features/mealDeatils/MealIngredients";
+import PreparationSteps from "../../../features/mealDeatils/PreparationSteps";
 import RecipeStats from "../../../features/mealDeatils/RecipeStats";
 import WatchRecipe from "../../../features/mealDeatils/WatchRecipe";
 
@@ -192,6 +193,9 @@ const MealDetailScreen = () => {
 
           {/* Ingredients List */}
           <MealIngredients mealDetails={mealDetails} />
+
+          {/* Preparation Steps */}
+          <PreparationSteps instructions={mealDetails?.strInstructions ?? ""} />
         </ScrollView>
       </View>
     </SafeAreaView>

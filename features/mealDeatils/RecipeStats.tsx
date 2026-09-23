@@ -35,7 +35,7 @@ const RecipeStats = ({ cuisineType }: { cuisineType: string }) => {
     {
       icon: <Users color={danger} />,
       title: "Servings",
-      description: "2 Serves",
+      description: "3 Serves",
     },
   ];
 
