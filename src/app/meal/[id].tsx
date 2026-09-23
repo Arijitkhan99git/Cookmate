@@ -13,6 +13,7 @@ import { useThemeColors } from "../../../constants/color-pallette";
 import { useGenericShadow } from "../../../constants/genericShadowStyle";
 import { fonts } from "../../../constants/typography";
 import { MealBlogLinkCard } from "../../../features/mealDeatils/MealBlogLinkCard";
+import MealIngredients from "../../../features/mealDeatils/MealIngredients";
 import RecipeStats from "../../../features/mealDeatils/RecipeStats";
 import WatchRecipe from "../../../features/mealDeatils/WatchRecipe";
 
@@ -188,6 +189,9 @@ const MealDetailScreen = () => {
             videoUrl={mealDetails?.strYoutube ?? null}
             imageUrl={mealDetails?.strMealThumb}
           />
+
+          {/* Ingredients List */}
+          <MealIngredients mealDetails={mealDetails} />
         </ScrollView>
       </View>
     </SafeAreaView>
