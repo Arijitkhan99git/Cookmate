@@ -1,5 +1,6 @@
 import { AppText } from "@/components/AppText";
 import CommonBookmark from "@/components/CommonBookmark";
+import ErrorState from "@/components/ErrorState";
 import NormalBadge from "@/components/NormalBadge";
 import RatingBadge from "@/components/RatingBadge";
 import { Image } from "expo-image";
@@ -17,6 +18,7 @@ import MealIngredients from "../../../features/mealDeatils/MealIngredients";
 import PreparationSteps from "../../../features/mealDeatils/PreparationSteps";
 import RecipeStats from "../../../features/mealDeatils/RecipeStats";
 import WatchRecipe from "../../../features/mealDeatils/WatchRecipe";
+import MealDetailsSkeleton from "./mealDetailsSkeleton";
 
 const MealDetailScreen = () => {
   const {
@@ -44,6 +46,24 @@ const MealDetailScreen = () => {
   const shadowStyle = useGenericShadow();
 
   const blogShadow = useGenericShadow(1);
+
+  if (isLoading) {
+    return <MealDetailsSkeleton />;
+  }
+
+  if (isError) {
+    return (
+      <ErrorState
+        title="Unable to load recipe"
+        message={
+          error?.message ||
+          "Could not fetch details for this recipe. Please check your connection."
+        }
+        onRetry={refetch}
+        isRetrying={isRefetching}
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: background }}>

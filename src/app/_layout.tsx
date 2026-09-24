@@ -1,5 +1,10 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  onlineManager,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import { useFonts } from "expo-font";
+import * as Network from "expo-network";
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useAtom } from "jotai";
@@ -7,6 +12,34 @@ import { useEffect, useMemo } from "react";
 import { Platform, View } from "react-native";
 import { useThemeColors } from "../../constants/color-pallette";
 import { getStoredThemePreference, themeAtom } from "../../store/theme-store";
+
+onlineManager.setEventListener((setOnline) => {
+  let initialised = false;
+
+  // Listen for changes
+  const eventSubscription = Network.addNetworkStateListener((state) => {
+    initialised = true;
+    setOnline(!!state.isConnected);
+  });
+
+  // Fetch the initial state immediately on boot
+  Network.getNetworkStateAsync()
+    .then((state) => {
+      if (!initialised) {
+        setOnline(!!state.isConnected);
+      }
+    })
+    .catch(() => {
+      /* Handle optional native error safely */
+    });
+
+  // Return unsubscribe cleanup function
+  return () => {
+    if (eventSubscription && typeof eventSubscription.remove === "function") {
+      eventSubscription.remove();
+    }
+  };
+});
 
 export default function RootLayout() {
   // Create a client
@@ -23,6 +56,7 @@ export default function RootLayout() {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const navigationTheme = useMemo(() => {
     const base = colors.isDarkMode ? DarkTheme : DefaultTheme;
     return {
