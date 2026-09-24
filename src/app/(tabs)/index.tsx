@@ -11,9 +11,6 @@ import TrendingMeal from "../../../features/home/components/TrendingMeal";
 
 export default function Index() {
   const { background } = useThemeColors();
-  const colors = useThemeColors();
-
-  const isDark = colors.isDarkMode;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: background }}>
