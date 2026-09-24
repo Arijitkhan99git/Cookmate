@@ -1,6 +1,7 @@
 import { AppText } from "@/components/AppText";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import { AlertCircle, Flame, RefreshCw, Timer } from "lucide-react-native";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
@@ -29,6 +30,8 @@ const TrendingMeal = () => {
     surfaceSecondary,
   } = useThemeColors();
 
+  const router = useRouter();
+
   const { data, isLoading, isError, error, refetch, isRefetching } =
     useFetchRandomMeal();
   const meal = data?.meals?.[0];
@@ -43,7 +46,7 @@ const TrendingMeal = () => {
     : (["#fff8f4ff", "#ffe0c8ff"] as const);
 
   const handleRandomCook = ({ mealId }: { mealId: string }) => {
-    console.log(mealId);
+    router.push(`/meal/${mealId}`);
   };
 
   return (
@@ -125,111 +128,116 @@ const TrendingMeal = () => {
 
       {/* ── Random Meal Card ── */}
       {!isLoading && !isError && (
-        <LinearGradient
-          colors={gradientColors}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={[
-            styles.card,
-            { shadowColor: isDarkMode ? "#000000" : "#c17a4bff" },
-          ]}
+        <Pressable
+          onPress={() => handleRandomCook({ mealId: meal?.idMeal ?? "" })}
         >
-          {/* Circular meal image */}
-          <View style={styles.imageWrapper}>
-            <Image
-              source={{ uri: meal?.strMealThumb }}
-              style={styles.mealImage}
-              contentFit="cover"
-            />
-          </View>
+          <LinearGradient
+            colors={gradientColors}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={[
+              styles.card,
+              { shadowColor: isDarkMode ? "#000000" : "#c17a4bff" },
+            ]}
+          >
+            {/* Circular meal image */}
+            <View style={styles.imageWrapper}>
+              <Image
+                source={{ uri: meal?.strMealThumb }}
+                style={styles.mealImage}
+                contentFit="cover"
+              />
+            </View>
 
-          {/* Right content */}
-          <View style={styles.content}>
-            {/* Level pill + time */}
-            <View style={styles.metaRow}>
-              <View
+            {/* Right content */}
+            <View style={styles.content}>
+              {/* Level pill + time */}
+              <View style={styles.metaRow}>
+                <View
+                  style={[
+                    styles.levelPill,
+                    { backgroundColor: isDarkMode ? surfaceHigh : "#e8d5c4ff" },
+                  ]}
+                >
+                  <AppText
+                    style={{
+                      fontFamily: fonts.semibold,
+                      fontSize: 11,
+                      color: orangeTint,
+                    }}
+                  >
+                    Easy
+                  </AppText>
+                </View>
+                <View style={styles.timeRow}>
+                  <Timer size={13} color={secondaryText} />
+                  <AppText
+                    style={{
+                      fontFamily: fonts.medium,
+                      fontSize: 12,
+                      color: secondaryText,
+                    }}
+                  >
+                    25 min
+                  </AppText>
+                </View>
+              </View>
+
+              {/* Meal title from API */}
+              <AppText
+                style={{
+                  fontFamily: fonts.bold,
+                  fontSize: 20,
+                  color: headingColor,
+                  lineHeight: 26,
+                  marginTop: 2,
+                }}
+                numberOfLines={2}
+              >
+                {meal?.strMeal}
+              </AppText>
+
+              {/* Kcal · Protein */}
+              <View style={styles.statsRow}>
+                <AppText style={{ fontSize: 13, color: secondaryText }}>
+                  380 kcal
+                </AppText>
+                <View
+                  style={[styles.dot, { backgroundColor: secondaryText }]}
+                />
+                <AppText style={{ fontSize: 13, color: secondaryText }}>
+                  High Protein
+                </AppText>
+              </View>
+
+              {/* CTA Button */}
+              <AnimatedPressable
                 style={[
-                  styles.levelPill,
-                  { backgroundColor: isDarkMode ? surfaceHigh : "#e8d5c4ff" },
+                  styles.ctaBtn,
+                  { backgroundColor: primary },
+                  animatedStyle,
                 ]}
+                onPressIn={() => {
+                  scale.value = withTiming(0.94, { duration: 100 });
+                }}
+                onPressOut={() => {
+                  scale.value = withTiming(1, { duration: 150 });
+                }}
+                hitSlop={6}
               >
                 <AppText
                   style={{
                     fontFamily: fonts.semibold,
-                    fontSize: 11,
-                    color: orangeTint,
+                    fontSize: 14,
+                    color: "#fff",
                   }}
                 >
-                  Easy
+                  Let's cook 🍳
                 </AppText>
-              </View>
-              <View style={styles.timeRow}>
-                <Timer size={13} color={secondaryText} />
-                <AppText
-                  style={{
-                    fontFamily: fonts.medium,
-                    fontSize: 12,
-                    color: secondaryText,
-                  }}
-                >
-                  25 min
-                </AppText>
-              </View>
+              </AnimatedPressable>
             </View>
-
-            {/* Meal title from API */}
-            <AppText
-              style={{
-                fontFamily: fonts.bold,
-                fontSize: 20,
-                color: headingColor,
-                lineHeight: 26,
-                marginTop: 2,
-              }}
-              numberOfLines={2}
-            >
-              {meal?.strMeal}
-            </AppText>
-
-            {/* Kcal · Protein */}
-            <View style={styles.statsRow}>
-              <AppText style={{ fontSize: 13, color: secondaryText }}>
-                380 kcal
-              </AppText>
-              <View style={[styles.dot, { backgroundColor: secondaryText }]} />
-              <AppText style={{ fontSize: 13, color: secondaryText }}>
-                High Protein
-              </AppText>
-            </View>
-
-            {/* CTA Button */}
-            <AnimatedPressable
-              style={[
-                styles.ctaBtn,
-                { backgroundColor: primary },
-                animatedStyle,
-              ]}
-              onPressIn={() => {
-                scale.value = withTiming(0.94, { duration: 100 });
-              }}
-              onPressOut={() => {
-                scale.value = withTiming(1, { duration: 150 });
-              }}
-              onPress={() => handleRandomCook({ mealId: meal?.idMeal ?? "" })}
-              hitSlop={6}
-            >
-              <AppText
-                style={{
-                  fontFamily: fonts.semibold,
-                  fontSize: 14,
-                  color: "#fff",
-                }}
-              >
-                Let's cook 🍳
-              </AppText>
-            </AnimatedPressable>
-          </View>
-        </LinearGradient>
+          </LinearGradient>
+        </Pressable>
       )}
     </View>
   );

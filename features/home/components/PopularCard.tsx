@@ -63,7 +63,7 @@ const DetailsButton = () => {
   );
 };
 
-const FeaturedCard = ({ item }: MealCardProps) => {
+const PopularCard = ({ item }: MealCardProps) => {
   const [saved, setSaved] = useState(false);
   const router = useRouter();
 
@@ -238,7 +238,7 @@ const FeaturedCard = ({ item }: MealCardProps) => {
   );
 };
 
-export default FeaturedCard;
+export default PopularCard;
 
 const styles = StyleSheet.create({
   shadowWrapper: {

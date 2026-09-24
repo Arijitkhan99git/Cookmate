@@ -12,7 +12,7 @@ import { useFetchMealsByIds } from "../../../api/hooks/useFetchMealsByIds";
 import { useThemeColors } from "../../../constants/color-pallette";
 import { fonts } from "../../../constants/typography";
 import { FeaturedSkeletonRow } from "../skeletons/FeaturedSkeleton";
-import FeaturedCard from "./FeaturedCard";
+import PopularCard from "./PopularCard";
 import { SectionHeading } from "./SectionHeading";
 
 const HomePopularLunch = () => {
@@ -136,7 +136,7 @@ const HomePopularLunch = () => {
             horizontal
             showsHorizontalScrollIndicator={false}
             keyExtractor={(item) => item.idMeal}
-            renderItem={({ item }) => <FeaturedCard item={item} />}
+            renderItem={({ item }) => <PopularCard item={item} />}
             snapToInterval={CARD_WIDTH + gap}
             decelerationRate="fast"
             snapToAlignment="start"
