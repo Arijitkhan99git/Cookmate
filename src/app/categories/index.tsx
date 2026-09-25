@@ -11,7 +11,7 @@ import {
   UtensilsCrossed,
   X,
 } from "lucide-react-native";
-import { useMemo, useState } from "react";
+import React, { memo, useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -33,27 +33,309 @@ import { fonts } from "../../../constants/typography";
 import SearchModalSkeleton from "../../../features/search/components/SearchModalSkeleton";
 import NormalBadge from "../../components/NormalBadge";
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type MixedCategory = Category & { recipeCount: number; tag: string };
+
+// ─── CategoryCard (extracted + memoized) ─────────────────────────────────────
+
+type CategoryCardProps = {
+  item: MixedCategory;
+  onPress: (item: MixedCategory) => void;
+};
+
+const CategoryCard = memo(({ item, onPress }: CategoryCardProps) => {
+  const {
+    card,
+    text: textColor,
+    secondaryText,
+    isDarkMode,
+    surfaceHigh,
+  } = useThemeColors();
+  const shadowStyle = useGenericShadow(1);
+
+  const borderColor = isDarkMode ? "#342822ff" : "#fbece0ff";
+  const arrowBtnBg = isDarkMode ? surfaceHigh : "#f2e6db";
+
+  const handlePress = useCallback(() => onPress(item), [onPress, item]);
+
+  return (
+    <Pressable
+      style={({ pressed }) => [
+        styles.cardContainer,
+        shadowStyle,
+        {
+          backgroundColor: card,
+          borderColor,
+          shadowColor: isDarkMode ? "#000000" : "#d89e77ff",
+          opacity: pressed ? 0.92 : 1,
+          transform: [{ scale: pressed ? 0.98 : 1 }],
+        },
+      ]}
+      onPress={handlePress}
+    >
+      {/* Top Row: Thumbnail + Arrow Button */}
+      <View style={styles.cardHeaderRow}>
+        <View>
+          <Image
+            source={{ uri: item.strCategoryThumb }}
+            style={styles.thumbImage}
+            contentFit="contain"
+            transition={150}
+          />
+        </View>
+
+        <View style={[styles.arrowBtn, { backgroundColor: arrowBtnBg }]}>
+          <ArrowRight size={14} color={textColor} />
+        </View>
+      </View>
+
+      {/* Category Tag Badge */}
+      <View style={styles.tagWrapper}>
+        <NormalBadge
+          badgeTitle={item.tag}
+          fontFamily={fonts.medium}
+          lightBgColor="#faefe1ff"
+          lightTextColor="#92400E"
+        />
+      </View>
+
+      {/* Category Title & Recipe Count */}
+      <View style={styles.cardContent}>
+        <AppText
+          style={[styles.categoryTitle, { color: textColor }]}
+          numberOfLines={1}
+        >
+          {item.strCategory}
+        </AppText>
+        <AppText style={[styles.recipeCountText, { color: secondaryText }]}>
+          {item.recipeCount} recipes
+        </AppText>
+      </View>
+    </Pressable>
+  );
+});
+
+// ─── TopNavBar (extracted + memoized) ────────────────────────────────────────
+
+type TopNavBarProps = {
+  onBack: () => void;
+};
+
+const TopNavBar = memo(({ onBack }: TopNavBarProps) => {
+  const { text: textColor, isDarkMode } = useThemeColors();
+
+  return (
+    <View style={styles.topNavBar}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.backBtn,
+          {
+            backgroundColor: isDarkMode
+              ? "rgba(255,255,255,0.08)"
+              : "rgba(0,0,0,0.05)",
+            opacity: pressed ? 0.7 : 1,
+          },
+        ]}
+        onPress={onBack}
+        hitSlop={8}
+      >
+        <ArrowLeft size={18} color={textColor} />
+      </Pressable>
+
+      <AppText style={[styles.navTitle, { color: textColor }]}>
+        All Categories
+      </AppText>
+    </View>
+  );
+});
+
+// ─── CategoriesHeader (extracted + memoized) ─────────────────────────────────
+
+type CategoriesHeaderProps = {
+  totalRecipesCount: number;
+  categoriesCount: number;
+  searchQuery: string;
+  onSearchChange: (text: string) => void;
+  onClearSearch: () => void;
+};
+
+const CategoriesHeader = memo(
+  ({
+    totalRecipesCount,
+    categoriesCount,
+    searchQuery,
+    onSearchChange,
+    onClearSearch,
+  }: CategoriesHeaderProps) => {
+    const {
+      text: textColor,
+      secondaryText,
+      primary,
+      isDarkMode,
+      surfaceHigh,
+    } = useThemeColors();
+
+    const iconMuted = isDarkMode ? "rgba(255, 255, 255, 0.12)" : "#ebe9e9ff";
+    const borderColor = isDarkMode ? "#342822ff" : "#fbece0ff";
+    const searchBg = isDarkMode ? "#29201c" : "#ffffff";
+
+    return (
+      <View style={styles.headerContainer}>
+        {/* Directory Title Section */}
+        <View style={styles.directoryHeader}>
+          <View style={styles.directoryTagRow}>
+            <AppText style={[styles.directoryLabel, { color: primary }]}>
+              CUISINE DIRECTORY
+            </AppText>
+
+            <View
+              style={[
+                styles.totalBadge,
+                { backgroundColor: isDarkMode ? surfaceHigh : "#f7e8da" },
+              ]}
+            >
+              <UtensilsCrossed size={12} color={primary} />
+              <AppText style={[styles.totalBadgeText, { color: textColor }]}>
+                {totalRecipesCount || 796} Total Recipes
+              </AppText>
+            </View>
+          </View>
+
+          <AppText style={[styles.subtitle, { color: secondaryText }]}>
+            Explore {categoriesCount || 14} curated recipe collections crafted
+            for culinary joy
+          </AppText>
+        </View>
+
+        {/* Search Bar */}
+        <View
+          style={[
+            styles.searchContainer,
+            {
+              backgroundColor: searchBg,
+              borderColor,
+              shadowColor: isDarkMode ? "#000000" : "#C08060",
+            },
+          ]}
+        >
+          <Search size={18} color={primary} style={styles.searchIcon} />
+          <TextInput
+            style={[styles.searchInput, { color: textColor }]}
+            placeholder="Search categories or ingredients..."
+            placeholderTextColor={secondaryText}
+            value={searchQuery}
+            onChangeText={onSearchChange}
+            returnKeyType="search"
+          />
+          {searchQuery.length > 0 && (
+            <Pressable
+              style={({ pressed }) => [
+                styles.clearBtn,
+                {
+                  backgroundColor: iconMuted,
+                  opacity: pressed ? 0.7 : 1,
+                  shadowColor: isDarkMode ? "#000000" : "#cdb0a2ff",
+                },
+              ]}
+              onPress={onClearSearch}
+              hitSlop={8}
+            >
+              <X size={20} color={isDarkMode ? "#fff" : "#595757ff"} />
+            </Pressable>
+          )}
+        </View>
+      </View>
+    );
+  },
+);
+
+// ─── FooterBanner (extracted + memoized) ─────────────────────────────────────
+
+type FooterBannerProps = {
+  onSurpriseMe: () => void;
+  isSurpriseLoading: boolean;
+};
+
+const FooterBanner = memo(
+  ({ onSurpriseMe, isSurpriseLoading }: FooterBannerProps) => {
+    const {
+      text: textColor,
+      secondaryText,
+      primary,
+      isDarkMode,
+      surfaceHigh,
+    } = useThemeColors();
+
+    return (
+      <View
+        style={[
+          styles.bannerCard,
+          {
+            backgroundColor: isDarkMode ? "#2e211b" : "#faede2",
+            borderColor: isDarkMode ? "#3d2b22" : "#f5dcd0",
+          },
+        ]}
+      >
+        <View style={[styles.bannerIconWrapper, { backgroundColor: primary }]}>
+          <Sparkles size={20} color="#FFFFFF" />
+        </View>
+
+        <View style={styles.bannerTextContent}>
+          <AppText style={[styles.bannerTitle, { color: textColor }]}>
+            Need a recommendation?
+          </AppText>
+          <AppText
+            style={[styles.bannerSubtitle, { color: secondaryText }]}
+            numberOfLines={2}
+          >
+            Let Cookmate pick a dish for you
+          </AppText>
+        </View>
+
+        <Pressable
+          style={({ pressed }) => [
+            styles.surpriseBtn,
+            {
+              backgroundColor: isDarkMode ? surfaceHigh : "#FFFFFF",
+              opacity: pressed || isSurpriseLoading ? 0.75 : 1,
+            },
+          ]}
+          onPress={onSurpriseMe}
+          disabled={isSurpriseLoading}
+        >
+          {isSurpriseLoading ? (
+            <ActivityIndicator size="small" color={primary} />
+          ) : (
+            <AppText style={[styles.surpriseBtnText, { color: textColor }]}>
+              Surprise Me
+            </AppText>
+          )}
+        </Pressable>
+      </View>
+    );
+  },
+);
+
+// ─── Main Screen ──────────────────────────────────────────────────────────────
+
 export default function AllCategoriesScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const {
-    background,
-    card,
-    text: textColor,
-    secondaryText,
-    primary,
-    isDarkMode,
-    surfaceHigh,
-  } = useThemeColors();
-
-  const iconMuted = isDarkMode ? "rgba(255, 255, 255, 0.12)" : "#ebe9e9ff";
-
-  const shadowStyle = useGenericShadow(1);
+  const { background } = useThemeColors();
 
   // Fetch categories from API
   const { data, isLoading, isError, refetch, isRefetching } =
     useFetchAllCategories();
+
+  // Fetch random meal for Surprise Me
+  const {
+    data: randomMealData,
+    refetch: randomMealRefetch,
+    isFetching: isSurpriseLoading,
+  } = useFetchRandomMeal();
+  const randomMeal = randomMealData?.meals?.[0];
 
   // Combine API categories with static recipeCount & tag metadata
   const categoriesList = useMemo(() => {
@@ -61,7 +343,6 @@ export default function AllCategoriesScreen() {
     const metaMap = new Map(
       MEAL_CATEGORIES.map((item) => [item.strCategory.toLowerCase(), item]),
     );
-
     return apiCategories.map((cat) => {
       const meta = metaMap.get(cat.strCategory.toLowerCase());
       return {
@@ -72,10 +353,11 @@ export default function AllCategoriesScreen() {
     });
   }, [data?.categories]);
 
-  // Total calculated recipes across all categories
-  const totalRecipesCount = useMemo(() => {
-    return categoriesList.reduce((acc, curr) => acc + curr.recipeCount, 0);
-  }, [categoriesList]);
+  // Total calculated recipes
+  const totalRecipesCount = useMemo(
+    () => categoriesList.reduce((acc, curr) => acc + curr.recipeCount, 0),
+    [categoriesList],
+  );
 
   // Filter categories by search query
   const filteredCategories = useMemo(() => {
@@ -88,20 +370,20 @@ export default function AllCategoriesScreen() {
     );
   }, [categoriesList, searchQuery]);
 
-  const borderColor = isDarkMode ? "#342822ff" : "#fbece0ff";
-  const searchBg = isDarkMode ? "#29201c" : "#ffffff";
-  const arrowBtnBg = isDarkMode ? surfaceHigh : "#f2e6db";
+  // ── Stable callbacks ────────────────────────────────────────────────────────
 
-  //fetch a random meal
-  const {
-    data: randomMealData,
-    refetch: randomMealRefetch,
-    isFetching: isSurpriseLoading,
-  } = useFetchRandomMeal();
-  const randomMeal = randomMealData?.meals?.[0];
+  const handleBack = useCallback(() => router.back(), [router]);
 
-  // Handle Surprise Me action
-  const handleSurpriseMe = async () => {
+  const handleClearSearch = useCallback(() => setSearchQuery(""), []);
+
+  const handleCategoryPress = useCallback(
+    (_item: MixedCategory) => {
+      router.push(`/(tabs)/search`);
+    },
+    [router],
+  );
+
+  const handleSurpriseMe = useCallback(async () => {
     try {
       const res = await randomMealRefetch();
       const mealId = res.data?.meals?.[0]?.idMeal || randomMeal?.idMeal;
@@ -111,222 +393,55 @@ export default function AllCategoriesScreen() {
     } catch (err) {
       console.error("Failed to fetch random meal", err);
     }
-  };
+  }, [randomMealRefetch, randomMeal, router]);
 
-  const renderCategoryCard = ({
-    item,
-  }: {
-    item: Category & { recipeCount: number; tag: string };
-  }) => {
-    return (
-      <Pressable
-        style={({ pressed }) => [
-          styles.cardContainer,
-          shadowStyle,
-          {
-            backgroundColor: card,
-            borderColor: borderColor,
-            shadowColor: isDarkMode ? "#000000" : "#d89e77ff",
-            opacity: pressed ? 0.92 : 1,
-            transform: [{ scale: pressed ? 0.98 : 1 }],
-          },
-        ]}
-        onPress={() => {
-          // Navigate to meal details or search list for category
-          router.push(`/(tabs)/search`);
-        }}
-      >
-        {/* Top Row: Thumbnail + Arrow Button */}
-        <View style={styles.cardHeaderRow}>
-          <View>
-            <Image
-              source={{ uri: item.strCategoryThumb }}
-              style={styles.thumbImage}
-              contentFit="contain"
-              transition={150}
-            />
-          </View>
+  // ── Memoized renderItem ─────────────────────────────────────────────────────
 
-          <View style={[styles.arrowBtn, { backgroundColor: arrowBtnBg }]}>
-            <ArrowRight size={14} color={textColor} />
-          </View>
-        </View>
-
-        {/* Category Tag Badge */}
-        <View style={styles.tagWrapper}>
-          <NormalBadge
-            badgeTitle={item.tag}
-            fontFamily={fonts.medium}
-            lightBgColor="#faefe1ff"
-            lightTextColor="#92400E"
-          />
-        </View>
-
-        {/* Category Title & Recipe Count */}
-        <View style={styles.cardContent}>
-          <AppText
-            style={[styles.categoryTitle, { color: textColor }]}
-            numberOfLines={1}
-          >
-            {item.strCategory}
-          </AppText>
-          <AppText style={[styles.recipeCountText, { color: secondaryText }]}>
-            {item.recipeCount} recipes
-          </AppText>
-        </View>
-      </Pressable>
-    );
-  };
-
-  const TopNavBarComponent = (
-    <View style={styles.topNavBar}>
-      <Pressable
-        style={({ pressed }) => [
-          styles.backBtn,
-          {
-            backgroundColor: isDarkMode
-              ? "rgba(255,255,255,0.08)"
-              : "rgba(0,0,0,0.05)",
-            opacity: pressed ? 0.7 : 1,
-          },
-        ]}
-        onPress={() => router.back()}
-        hitSlop={8}
-      >
-        <ArrowLeft size={18} color={textColor} />
-      </Pressable>
-
-      <AppText style={[styles.navTitle, { color: textColor }]}>
-        All Categories
-      </AppText>
-    </View>
+  const renderCategoryCard = useCallback(
+    ({ item }: { item: MixedCategory }) => (
+      <CategoryCard item={item} onPress={handleCategoryPress} />
+    ),
+    [handleCategoryPress],
   );
 
-  const HeaderComponent = (
-    <View style={styles.headerContainer}>
-      {/* Directory Title Section */}
-      <View style={styles.directoryHeader}>
-        <View style={styles.directoryTagRow}>
-          <AppText style={[styles.directoryLabel, { color: primary }]}>
-            CUISINE DIRECTORY
-          </AppText>
+  // ── Memoized header / footer for FlatList ───────────────────────────────────
 
-          <View
-            style={[
-              styles.totalBadge,
-              { backgroundColor: isDarkMode ? surfaceHigh : "#f7e8da" },
-            ]}
-          >
-            <UtensilsCrossed size={12} color={primary} />
-            <AppText style={[styles.totalBadgeText, { color: textColor }]}>
-              {totalRecipesCount || 796} Total Recipes
-            </AppText>
-          </View>
-        </View>
+  const listHeader = useMemo(
+    () => (
+      <CategoriesHeader
+        totalRecipesCount={totalRecipesCount}
+        categoriesCount={categoriesList.length}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onClearSearch={handleClearSearch}
+      />
+    ),
+    [totalRecipesCount, categoriesList.length, searchQuery, handleClearSearch],
+  );
 
-        <AppText style={[styles.subtitle, { color: secondaryText }]}>
-          Explore {categoriesList.length || 14} curated recipe collections
-          crafted for culinary joy
-        </AppText>
-      </View>
-
-      {/* Search Bar */}
-      <View
-        style={[
-          styles.searchContainer,
-          {
-            backgroundColor: searchBg,
-            borderColor: borderColor,
-            shadowColor: isDarkMode ? "#000000" : "#C08060",
-          },
-        ]}
-      >
-        <Search size={18} color={primary} style={styles.searchIcon} />
-        <TextInput
-          style={[styles.searchInput, { color: textColor }]}
-          placeholder="Search categories or ingredients..."
-          placeholderTextColor={secondaryText}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          returnKeyType="search"
+  const listFooter = useMemo(
+    () =>
+      filteredCategories.length > 0 ? (
+        <FooterBanner
+          onSurpriseMe={handleSurpriseMe}
+          isSurpriseLoading={isSurpriseLoading}
         />
-        {searchQuery.length > 0 && (
-          <Pressable
-            style={({ pressed }) => [
-              styles.clearBtn,
-              {
-                backgroundColor: iconMuted,
-                opacity: pressed ? 0.7 : 1,
-                shadowColor: isDarkMode ? "#000000" : "#cdb0a2ff",
-              },
-            ]}
-            onPress={() => setSearchQuery("")}
-            hitSlop={8}
-          >
-            <X size={20} color={isDarkMode ? "#fff" : "#595757ff"} />
-          </Pressable>
-        )}
-      </View>
-    </View>
+      ) : undefined,
+    [filteredCategories.length, handleSurpriseMe, isSurpriseLoading],
   );
 
-  const FooterBanner = (
-    <View
-      style={[
-        styles.bannerCard,
-        {
-          backgroundColor: isDarkMode ? "#2e211b" : "#faede2",
-          borderColor: isDarkMode ? "#3d2b22" : "#f5dcd0",
-        },
-      ]}
-    >
-      <View style={[styles.bannerIconWrapper, { backgroundColor: primary }]}>
-        <Sparkles size={20} color="#FFFFFF" />
-      </View>
-
-      <View style={styles.bannerTextContent}>
-        <AppText style={[styles.bannerTitle, { color: textColor }]}>
-          Need a recommendation?
-        </AppText>
-        <AppText
-          style={[styles.bannerSubtitle, { color: secondaryText }]}
-          numberOfLines={2}
-        >
-          Let Cookmate pick a dish for you
-        </AppText>
-      </View>
-
-      <Pressable
-        style={({ pressed }) => [
-          styles.surpriseBtn,
-          {
-            backgroundColor: isDarkMode ? surfaceHigh : "#FFFFFF",
-            opacity: pressed || isSurpriseLoading ? 0.75 : 1,
-          },
-        ]}
-        onPress={handleSurpriseMe}
-        disabled={isSurpriseLoading}
-      >
-        {isSurpriseLoading ? (
-          <ActivityIndicator size="small" color={primary} />
-        ) : (
-          <AppText style={[styles.surpriseBtnText, { color: textColor }]}>
-            Surprise Me
-          </AppText>
-        )}
-      </Pressable>
-    </View>
-  );
+  // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: background }]}>
-      {TopNavBarComponent}
+      <TopNavBar onBack={handleBack} />
+
       {isLoading ? (
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listPadding}
         >
-          {HeaderComponent}
+          {listHeader}
           <SearchModalSkeleton count={6} />
         </ScrollView>
       ) : isError ? (
@@ -334,7 +449,7 @@ export default function AllCategoriesScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listPadding}
         >
-          {HeaderComponent}
+          {listHeader}
           <ErrorState
             fullScreen={false}
             title="Failed to load categories"
@@ -352,31 +467,30 @@ export default function AllCategoriesScreen() {
             filteredCategories.length > 0 ? styles.columnWrapper : undefined
           }
           showsVerticalScrollIndicator={false}
-          ListHeaderComponent={HeaderComponent}
+          ListHeaderComponent={listHeader}
           ListEmptyComponent={
             <EmptySearchState
               searchQuery={searchQuery}
-              onClearSearch={() => setSearchQuery("")}
+              onClearSearch={handleClearSearch}
             />
           }
-          ListFooterComponent={
-            filteredCategories.length > 0 ? FooterBanner : undefined
-          }
+          ListFooterComponent={listFooter}
           contentContainerStyle={styles.listPadding}
           renderItem={renderCategoryCard}
+          initialNumToRender={8}
+          maxToRenderPerBatch={8}
+          windowSize={5}
         />
       )}
     </SafeAreaView>
   );
 }
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  bodyWrapper: {
-    flex: 1,
-    paddingHorizontal: 16,
   },
   listPadding: {
     paddingHorizontal: 16,
@@ -410,13 +524,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
     fontSize: 22,
   },
-  profileAvatar: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   directoryHeader: {
     gap: 6,
   },
@@ -441,11 +548,6 @@ const styles = StyleSheet.create({
   totalBadgeText: {
     fontSize: 11.5,
     fontFamily: fonts.medium,
-  },
-  mainHeading: {
-    fontSize: 26,
-    fontFamily: fonts.bold,
-    marginTop: 2,
   },
   subtitle: {
     fontSize: 13,
