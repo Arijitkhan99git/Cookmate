@@ -1,4 +1,5 @@
 import { AppText } from "@/components/AppText";
+import EmptySearchState from "@/components/EmptySearchState";
 import ErrorState from "@/components/ErrorState";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAtomValue } from "jotai";
@@ -267,7 +268,9 @@ export const SearchList = () => {
           data={meals}
           keyExtractor={(item) => item.idMeal}
           numColumns={2}
-          columnWrapperStyle={styles.columnWrapper}
+          columnWrapperStyle={
+            meals.length > 0 ? styles.columnWrapper : undefined
+          }
           renderItem={({ item }) => (
             <View style={styles.gridItemWrapper}>
               <SearchMealCard mealDetails={item} />
@@ -277,7 +280,13 @@ export const SearchList = () => {
           maxToRenderPerBatch={6}
           windowSize={5}
           contentContainerStyle={styles.listContent}
-          ListFooterComponent={<ChefHackCard />}
+          ListEmptyComponent={
+            <EmptySearchState
+              searchQuery={searchQuery}
+              onClearSearch={() => setSearchQuery("")}
+            />
+          }
+          ListFooterComponent={meals.length > 0 ? <ChefHackCard /> : undefined}
         />
       )}
 

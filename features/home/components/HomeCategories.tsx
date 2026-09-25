@@ -1,5 +1,6 @@
 import { AppText } from "@/components/AppText";
 import { AlertCircle, RefreshCw } from "lucide-react-native";
+import { useRouter } from "expo-router";
 import {
   FlatList,
   Image,
@@ -48,6 +49,7 @@ const CategoryItem = ({ item }: { item: Category }) => {
 // Main component
 // ─────────────────────────────────────────────────────────────────
 const HomeCategories = () => {
+  const router = useRouter();
   const {
     data: categoriesData,
     isLoading,
@@ -65,7 +67,7 @@ const HomeCategories = () => {
       {/* ── Header ── */}
       <View style={styles.titleRow}>
         <SectionHeading>Categories</SectionHeading>
-        <Pressable onPress={() => {}}>
+        <Pressable onPress={() => router.push("/categories" as any)}>
           <AppText style={{ color: primary, fontSize: 13 }}>See all</AppText>
         </Pressable>
       </View>

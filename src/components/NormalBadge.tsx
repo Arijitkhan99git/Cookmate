@@ -5,23 +5,40 @@ import { AppText } from "./AppText";
 
 type BadgeProps = {
   badgeTitle: string;
+  lightBgColor?: string;
+  darkBgColor?: string;
+  fontFamily?: string;
+  textColor?: string;
+  lightTextColor?: string;
+  darkTextColor?: string;
 };
 
-const NormalBadge = ({ badgeTitle }: BadgeProps) => {
+const NormalBadge = ({
+  badgeTitle,
+  lightBgColor = "#faf3e1ff",
+  darkBgColor,
+  fontFamily = fonts.semibold,
+  textColor,
+  lightTextColor,
+  darkTextColor,
+}: BadgeProps) => {
   const { orangeTint, isDarkMode, surfaceHigh } = useThemeColors();
 
+  const backgroundColor = isDarkMode
+    ? (darkBgColor ?? surfaceHigh)
+    : lightBgColor;
+
+  const color = isDarkMode
+    ? (darkTextColor ?? textColor ?? orangeTint)
+    : (lightTextColor ?? textColor ?? orangeTint);
+
   return (
-    <View
-      style={[
-        styles.levelPill,
-        { backgroundColor: isDarkMode ? surfaceHigh : "#e8d5c4ff" },
-      ]}
-    >
+    <View style={[styles.levelPill, { backgroundColor }]}>
       <AppText
         style={{
-          fontFamily: fonts.semibold,
+          fontFamily,
           fontSize: 11,
-          color: orangeTint,
+          color,
         }}
       >
         {badgeTitle}
