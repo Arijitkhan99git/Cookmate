@@ -7,4 +7,5 @@ export const API_ENDPOINTS = {
   listAllAreas: `${BASE_URL}list.php?a=list`,
   filterMeal: `${BASE_URL}filter.php`,
   randomMeal: `${BASE_URL}random.php`,
+  searchMeal: `${BASE_URL}search.php`,
 };

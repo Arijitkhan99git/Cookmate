@@ -18,7 +18,7 @@ export default function Index() {
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
-            padding: 20,
+            padding: 16,
             rowGap: 30,
             paddingBottom: 100,
           }}

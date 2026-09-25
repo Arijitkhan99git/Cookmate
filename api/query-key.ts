@@ -6,4 +6,8 @@ export const fetchQueryKey = createExtendedQueryKeys("home", {
   listAllAreas: () => ["home", "listAllAreas"] as const,
   mealsByArea: (area: string) => ["home", "mealsByArea", area] as const,
   randomMeal: () => ["home", "randomMeal"] as const,
+  searchMealbyName: (name: string) =>
+    ["home", "searchMealbyName", name] as const,
+  searchMealbyFirstLetter: (letter: string) =>
+    ["home", "searchMealbyFirstLetter", letter] as const,
 });
