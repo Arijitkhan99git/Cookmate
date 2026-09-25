@@ -1,5 +1,7 @@
 import { AppText } from "@/components/AppText";
+import ErrorState from "@/components/ErrorState";
 import { LinearGradient } from "expo-linear-gradient";
+import { useAtomValue } from "jotai";
 import {
     ChevronDown,
     Lightbulb,
@@ -9,7 +11,6 @@ import {
 } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
-    ActivityIndicator,
     FlatList,
     Platform,
     Pressable,
@@ -21,7 +22,9 @@ import { useSearchMealByFLetter } from "../../../api/hooks/useSearchMealByFlette
 import { useThemeColors } from "../../../constants/color-pallette";
 import { useGenericShadow } from "../../../constants/genericShadowStyle";
 import { fonts } from "../../../constants/typography";
+import { selectedCategoriesAtom } from "../../../store/filter-store";
 import SearchFilterModal from "./SearchFilterModal";
+import SearchListSkeleton from "./SearchListSkeleton";
 import SearchMealCard from "./SearchMealCard";
 
 const SearchInputWithFilter = ({
@@ -168,9 +171,17 @@ const ChefHackCard = () => {
 export const SearchList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const selectedCategories = useAtomValue(selectedCategoriesAtom);
 
   // Fetch data using searchMealByFLetter("c")
-  const { data: DataByFLetter, isLoading } = useSearchMealByFLetter("c");
+  const {
+    data: DataByFLetter,
+    isLoading,
+    isError,
+    refetch,
+    isRefetching,
+  } = useSearchMealByFLetter("c");
+
   const {
     text: textColor,
     secondaryText,
@@ -181,14 +192,26 @@ export const SearchList = () => {
 
   const sortBg = isDarkMode ? surfaceHigh : "#f4e7dc";
 
-  // Filter list based on search query
+  // Filter list based on selected categories & search query
   const meals = useMemo(() => {
-    const list = DataByFLetter?.meals || [];
-    if (!searchQuery.trim()) return list;
-    return list.filter((m) =>
-      m.strMeal.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
-  }, [DataByFLetter?.meals, searchQuery]);
+    let list = DataByFLetter?.meals || [];
+
+    if (selectedCategories.length > 0) {
+      list = list.filter(
+        (m) =>
+          selectedCategories.includes(m.strCategory) ||
+          selectedCategories.includes(m.strArea),
+      );
+    }
+
+    if (searchQuery.trim()) {
+      list = list.filter((m) =>
+        m.strMeal.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+    }
+
+    return list;
+  }, [DataByFLetter?.meals, selectedCategories, searchQuery]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -196,7 +219,7 @@ export const SearchList = () => {
         query={searchQuery}
         onChangeQuery={setSearchQuery}
         setModalVisible={setIsModalVisible}
-        activeFilterCount={0}
+        activeFilterCount={selectedCategories.length}
       />
 
       {/* ── Match Count Header & Dummy Sort Dropdown ── */}
@@ -228,11 +251,17 @@ export const SearchList = () => {
         </Pressable>
       </View>
 
-      {/* ── 2-Column Grid List ── */}
+      {/* ── Loading Skeleton / Error State / 2-Column Grid List ── */}
       {isLoading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={primary} />
-        </View>
+        <SearchListSkeleton count={6} />
+      ) : isError ? (
+        <ErrorState
+          fullScreen={false}
+          title="Failed to load recipes"
+          message="Something went wrong while fetching recipes. Please check your connection and try again."
+          onRetry={refetch}
+          isRetrying={isRefetching}
+        />
       ) : (
         <FlatList
           data={meals}
@@ -352,11 +381,6 @@ const styles = StyleSheet.create({
   sortTextValue: {
     fontSize: 12,
     fontFamily: fonts.semibold,
-  },
-  loadingContainer: {
-    paddingVertical: 40,
-    alignItems: "center",
-    justifyContent: "center",
   },
   listContent: {
     paddingBottom: 90,

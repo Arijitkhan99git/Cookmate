@@ -56,6 +56,7 @@ const HomeCategories = () => {
     refetch,
     isRefetching,
   } = useFetchAllCategories();
+
   const { primary, danger, secondaryText, surfaceSecondary, muted } =
     useThemeColors();
 

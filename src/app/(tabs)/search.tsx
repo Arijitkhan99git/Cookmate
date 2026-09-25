@@ -25,7 +25,8 @@ const styles = StyleSheet.create({
   },
   wrapperContainer: {
     flex: 1,
-    padding: 16,
+    paddingTop: 16,
+    paddingHorizontal: 16,
     rowGap: 30,
   },
 });

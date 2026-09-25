@@ -13,15 +13,10 @@ import RatingBadge from "../../../src/components/RatingBadge";
 import BookmarkButton from "./BookmarkButton";
 
 type SearchMealCardProps = {
-  mealDetails?: Meal;
-  mealDeatils?: Meal;
+  mealDetails: Meal;
 };
 
-export default function SearchMealCard({
-  mealDetails,
-  mealDeatils,
-}: SearchMealCardProps) {
-  const item = mealDetails || mealDeatils;
+export default function SearchMealCard({ mealDetails }: SearchMealCardProps) {
   const router = useRouter();
   const { card, text: textColor, secondaryText, isDarkMode } = useThemeColors();
 
@@ -31,19 +26,19 @@ export default function SearchMealCard({
 
   // Deterministically generate static rating (3.5 - 4.9) and cooking time (20 - 45 min) based on idMeal
   const { rating, cookingTime } = useMemo(() => {
-    if (!item?.idMeal) {
+    if (!mealDetails?.idMeal) {
       return { rating: "4.8", cookingTime: "25 min" };
     }
     let hash = 0;
-    for (let i = 0; i < item.idMeal.length; i++) {
-      hash = (hash * 31 + item.idMeal.charCodeAt(i)) % 1000;
+    for (let i = 0; i < mealDetails.idMeal.length; i++) {
+      hash = (hash * 31 + mealDetails.idMeal.charCodeAt(i)) % 1000;
     }
     const val = (3.5 + (hash % 15) / 10).toFixed(1);
     const time = 20 + (hash % 6) * 5;
     return { rating: val, cookingTime: `${time} min` };
-  }, [item?.idMeal]);
+  }, [mealDetails?.idMeal]);
 
-  if (!item) return null;
+  if (!mealDetails) return null;
 
   const ratingBadgeBg = isDarkMode
     ? "rgba(35, 28, 25, 0.85)"
@@ -62,12 +57,12 @@ export default function SearchMealCard({
           transform: [{ scale: pressed ? 0.98 : 1 }],
         },
       ]}
-      onPress={() => router.push(`/meal/${item.idMeal}`)}
+      onPress={() => router.push(`/meal/${mealDetails.idMeal}`)}
     >
       {/* ── Image Section with Overlay Badges ── */}
       <View style={styles.imageWrapper}>
         <Image
-          source={{ uri: item.strMealThumb }}
+          source={{ uri: mealDetails.strMealThumb }}
           style={styles.image}
           contentFit="cover"
           transition={200}
@@ -86,19 +81,19 @@ export default function SearchMealCard({
 
         {/* Bookmark Button Overlay (Top-Right) */}
         <View style={styles.bookmarkPosition}>
-          <BookmarkButton mealId={item.idMeal} size={15} />
+          <BookmarkButton mealId={mealDetails.idMeal} size={15} />
         </View>
       </View>
 
       {/* ── Content Section ── */}
       <View style={styles.contentContainer}>
         <AppText style={[styles.title, { color: textColor }]} numberOfLines={2}>
-          {item.strMeal}
+          {mealDetails.strMeal}
         </AppText>
 
         {/* Meta Row: Cuisine Area Badge & Cooking Time */}
         <View style={styles.metaRow}>
-          <NormalBadge badgeTitle={item.strArea || "Western"} />
+          <NormalBadge badgeTitle={mealDetails.strArea || "Western"} />
 
           <View style={styles.timeRow}>
             <Clock size={13} color={secondaryText} />
