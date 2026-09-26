@@ -285,7 +285,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 50, // how tall the fade is
+    height: 50,
+    // how tall the fade is
   },
   bookmarkBtn: {
     position: "absolute",

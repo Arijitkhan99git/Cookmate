@@ -10,4 +10,5 @@ export const fetchQueryKey = createExtendedQueryKeys("home", {
     ["home", "searchMealbyName", name] as const,
   searchMealbyFirstLetter: (letter: string) =>
     ["home", "searchMealbyFirstLetter", letter] as const,
+  mealsByCategory: (cat: string) => ["home", "mealsByCategory", cat] as const,
 });

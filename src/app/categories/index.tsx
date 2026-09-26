@@ -377,8 +377,14 @@ export default function AllCategoriesScreen() {
   const handleClearSearch = useCallback(() => setSearchQuery(""), []);
 
   const handleCategoryPress = useCallback(
-    (_item: MixedCategory) => {
-      router.push(`/(tabs)/search`);
+    (item: MixedCategory) => {
+      router.push({
+        pathname: `/categories/[name]`,
+        params: {
+          name: item.strCategory,
+          thumb: item.strCategoryThumb ?? "",
+        },
+      });
     },
     [router],
   );

@@ -1,6 +1,6 @@
 import { AppText } from "@/components/AppText";
-import { AlertCircle, RefreshCw } from "lucide-react-native";
 import { useRouter } from "expo-router";
+import { AlertCircle, RefreshCw } from "lucide-react-native";
 import {
   FlatList,
   Image,
@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 
+import { useCallback } from "react";
 import { useFetchAllCategories } from "../../../api/hooks/useCategories";
 import { Category } from "../../../api/model/categories-model";
 import { useThemeColors } from "../../../constants/color-pallette";
@@ -23,12 +24,20 @@ import { SectionHeading } from "./SectionHeading";
 const CategoryItem = ({ item }: { item: Category }) => {
   const { mutedText: catText } = useThemeColors();
 
-  const handlePress = (category: string) => {
-    console.log(category);
-  };
+  const router = useRouter();
+
+  const handlePress = useCallback(() => {
+    router.push({
+      pathname: `/categories/[name]`,
+      params: {
+        name: item.strCategory,
+        thumb: item.strCategoryThumb ?? "",
+      },
+    });
+  }, [router]);
 
   return (
-    <Pressable onPress={() => handlePress(item.strCategory)}>
+    <Pressable onPress={handlePress}>
       {/* Thumbnail */}
       <View style={styles.categoryItem}>
         <Image
