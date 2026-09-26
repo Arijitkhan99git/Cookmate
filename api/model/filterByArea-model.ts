@@ -1,7 +1,7 @@
 export interface FilterByAreaResponse {
   meals: Meal[];
 }
-interface Meal {
+export interface Meal {
   strMeal: string;
   strMealThumb: string;
   idMeal: string;

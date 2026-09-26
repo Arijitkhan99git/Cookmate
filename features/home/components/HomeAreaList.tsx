@@ -1,4 +1,5 @@
 import { AppText } from "@/components/AppText";
+import { useRouter } from "expo-router";
 import { AlertCircle, RefreshCw } from "lucide-react-native";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 import { useFetchMealsByAreasLists } from "../../../api/hooks/useListAllAreas";
@@ -11,6 +12,7 @@ import AreaCuisinesHomeCard from "./AreaCuisinesHomeCard";
 import { SectionHeading } from "./SectionHeading";
 
 const HomeAreaList = () => {
+  const router = useRouter();
   const { primary, danger, secondaryText, surfaceSecondary } = useThemeColors();
 
   const randomAreas = useRandomValidAreas(VALID_MEAL_AREAS, 10);
@@ -29,7 +31,7 @@ const HomeAreaList = () => {
       {/* ── Header ── */}
       <View style={styles.titleRow}>
         <SectionHeading>Explore Cuisines</SectionHeading>
-        <Pressable onPress={() => {}}>
+        <Pressable onPress={() => router.push("/cuisines" as any)}>
           <AppText style={{ color: primary, fontSize: 13 }}>Explore</AppText>
         </Pressable>
       </View>
