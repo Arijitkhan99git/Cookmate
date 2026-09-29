@@ -1,3 +1,4 @@
+import AppHeader from "@/components/AppHeader";
 import { AppText } from "@/components/AppText";
 import { useAtom } from "jotai";
 import React, { useRef, useState } from "react";
@@ -14,7 +15,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeColors } from "../../../constants/color-pallette";
 import { fonts } from "../../../constants/typography";
-import AppHeader from "@/components/AppHeader";
 import {
   setStoredThemePreference,
   themeAtom,
@@ -34,7 +34,12 @@ interface Milestone {
 // ─── Static Data ─────────────────────────────────────────────────────────────
 
 const MILESTONES: Milestone[] = [
-  { icon: "🍳", label: "Master of\nSearing", badge: "Bronze", status: "unlocked" },
+  {
+    icon: "🍳",
+    label: "Master of\nSearing",
+    badge: "Bronze",
+    status: "unlocked",
+  },
   { icon: "🔥", label: "30-Day Streak", badge: "Active", status: "active" },
   { icon: "🍝", label: "Pasta Artisan", badge: "Silver", status: "unlocked" },
 ];
@@ -121,8 +126,6 @@ function SectionCard({ children }: { children: React.ReactNode }) {
         borderRadius: 18,
         padding: 16,
         marginBottom: 18,
-        borderWidth: 1,
-        borderColor: colors.border,
       }}
     >
       {children}
@@ -138,11 +141,14 @@ function MilestoneCard({ item }: { item: Milestone }) {
   const badgeColor = isActive
     ? colors.primary
     : isLocked
-    ? colors.muted
-    : colors.rating;
+      ? colors.muted
+      : colors.rating;
 
-  const badgeTextColor =
-    isActive ? "#fff" : isLocked ? colors.textSecondary : "#fff";
+  const badgeTextColor = isActive
+    ? "#fff"
+    : isLocked
+      ? colors.textSecondary
+      : "#fff";
 
   return (
     <View
@@ -403,7 +409,8 @@ function HelpPrivacyModal({
               key={item.title}
               style={{
                 paddingVertical: 14,
-                borderBottomWidth: i < arr.length - 1 ? StyleSheet.hairlineWidth : 0,
+                borderBottomWidth:
+                  i < arr.length - 1 ? StyleSheet.hairlineWidth : 0,
                 borderBottomColor: colors.border,
               }}
             >
@@ -441,7 +448,11 @@ function HelpPrivacyModal({
             }}
           >
             <AppText
-              style={{ color: "#fff", fontFamily: fonts.semibold, fontSize: 15 }}
+              style={{
+                color: "#fff",
+                fontFamily: fonts.semibold,
+                fontSize: 15,
+              }}
             >
               Close
             </AppText>
@@ -460,7 +471,9 @@ export default function Profile() {
   const isDark = colors.isDarkMode;
 
   const [cookAlerts, setCookAlerts] = useState(true);
-  const [measureUnit, setMeasureUnit] = useState<"metric" | "imperial">("metric");
+  const [measureUnit, setMeasureUnit] = useState<"metric" | "imperial">(
+    "metric",
+  );
   const [helpModalVisible, setHelpModalVisible] = useState(false);
   const [allergenSelected, setAllergenSelected] = useState(false);
   const [grocerySelected, setGrocerySelected] = useState(false);

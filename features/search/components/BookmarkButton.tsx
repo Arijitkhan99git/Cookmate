@@ -1,29 +1,27 @@
+import { useAtom, useAtomValue } from "jotai";
 import { Heart } from "lucide-react-native";
-import { useState } from "react";
 import { Pressable, StyleProp, StyleSheet, ViewStyle } from "react-native";
 import { useThemeColors } from "../../../constants/color-pallette";
+import { isSavedAtom, toggleSavedAtom } from "../../../store/saved-store";
 
 type BookmarkButtonProps = {
-  mealId?: string;
-  initialSaved?: boolean;
-  onPress?: () => void;
+  mealId: string;
   style?: StyleProp<ViewStyle>;
   size?: number;
 };
 
 export const BookmarkButton = ({
   mealId,
-  initialSaved = false,
-  onPress,
   style,
   size = 16,
 }: BookmarkButtonProps) => {
-  const [saved, setSaved] = useState(initialSaved);
+  const [, toggleSaved] = useAtom(toggleSavedAtom);
+  const isSaved = useAtomValue(isSavedAtom(mealId));
+
   const { isDarkMode } = useThemeColors();
 
   const handleToggle = () => {
-    setSaved((prev) => !prev);
-    if (onPress) onPress();
+    toggleSaved(mealId);
   };
 
   const btnBg = isDarkMode ? "rgba(42, 34, 30, 0.9)" : "#FFFFFFFF";
@@ -46,8 +44,8 @@ export const BookmarkButton = ({
     >
       <Heart
         size={size}
-        fill={saved ? activeColor : "none"}
-        stroke={saved ? activeColor : inactiveColor}
+        fill={isSaved ? activeColor : "none"}
+        stroke={isSaved ? activeColor : inactiveColor}
       />
     </Pressable>
   );

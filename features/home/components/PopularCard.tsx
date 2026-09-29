@@ -2,8 +2,8 @@ import { AppText } from "@/components/AppText";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { useAtom, useAtomValue } from "jotai";
 import { Bookmark, Play, Timer } from "lucide-react-native";
-import { useState } from "react";
 import {
   Dimensions,
   Platform,
@@ -20,6 +20,7 @@ import Animated, {
 import { Meal } from "../../../api/model/fetchMealById-model";
 import { useThemeColors } from "../../../constants/color-pallette";
 import { fonts } from "../../../constants/typography";
+import { isSavedAtom, toggleSavedAtom } from "../../../store/saved-store";
 
 type MealCardProps = {
   item: Meal;
@@ -64,7 +65,12 @@ const DetailsButton = () => {
 };
 
 const PopularCard = ({ item }: MealCardProps) => {
-  const [saved, setSaved] = useState(false);
+  const mealId = item.idMeal;
+
+  const [, toggleSaved] = useAtom(toggleSavedAtom);
+
+  const isSaved = useAtomValue(isSavedAtom(mealId));
+
   const router = useRouter();
 
   const {
@@ -95,7 +101,7 @@ const PopularCard = ({ item }: MealCardProps) => {
       onPressOut={() => {
         cardScale.value = withTiming(1, { duration: 180 });
       }}
-      onPress={() => router.push(`/meal/${item.idMeal}`)}
+      onPress={() => router.push(`/meal/${mealId}`)}
     >
       <View
         style={[
@@ -143,13 +149,13 @@ const PopularCard = ({ item }: MealCardProps) => {
                 transform: [{ scale: pressed ? 0.92 : 1 }],
               },
             ]}
-            onPress={() => setSaved((prev) => !prev)}
+            onPress={() => toggleSaved(mealId)}
             hitSlop={8}
           >
             <Bookmark
               size={18}
-              stroke={saved ? primary : headingColor}
-              fill={saved ? primary : "none"}
+              stroke={isSaved ? primary : headingColor}
+              fill={isSaved ? primary : "none"}
             />
           </Pressable>
         </View>

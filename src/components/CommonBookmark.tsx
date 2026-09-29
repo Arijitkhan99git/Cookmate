@@ -1,7 +1,8 @@
+import { useAtom, useAtomValue } from "jotai";
 import { Bookmark } from "lucide-react-native";
-import { useState } from "react";
 import { Pressable, StyleProp, StyleSheet, ViewStyle } from "react-native";
 import { useThemeColors } from "../../constants/color-pallette";
+import { isSavedAtom, toggleSavedAtom } from "../../store/saved-store";
 
 const CommonBookmark = ({
   mealId,
@@ -10,13 +11,13 @@ const CommonBookmark = ({
   mealId: string;
   customStyle?: StyleProp<ViewStyle>;
 }) => {
-  const [saved, setSaved] = useState(false);
+  const [, toggleSaved] = useAtom(toggleSavedAtom);
+  const isSaved = useAtomValue(isSavedAtom(mealId));
 
   const { text: strockColor, primary, surfaceHigh } = useThemeColors();
 
   const handleBookMark = () => {
-    setSaved((prev) => !prev);
-    console.log(mealId);
+    toggleSaved(mealId);
   };
 
   return (
@@ -35,8 +36,8 @@ const CommonBookmark = ({
     >
       <Bookmark
         size={18}
-        stroke={saved ? primary : strockColor}
-        fill={saved ? primary : "none"}
+        stroke={isSaved ? primary : strockColor}
+        fill={isSaved ? primary : "none"}
       />
     </Pressable>
   );

@@ -11,6 +11,7 @@ import { useAtom } from "jotai";
 import { useEffect, useMemo } from "react";
 import { Platform, View } from "react-native";
 import { useThemeColors } from "../../constants/color-pallette";
+import { getStoredSavedIds, savedIdsAtom } from "../../store/saved-store";
 import { getStoredThemePreference, themeAtom } from "../../store/theme-store";
 
 onlineManager.setEventListener((setOnline) => {
@@ -55,6 +56,15 @@ export default function RootLayout() {
       setTheme(stored ?? (Platform.OS === "ios" ? "system" : "light"));
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  //    * Synchronous atom holding saved recipe IDs.
+  //  * Hydrate once on app mount:
+
+  const [, setSavedIds] = useAtom(savedIdsAtom);
+
+  useEffect(() => {
+    getStoredSavedIds().then(setSavedIds);
   }, []);
 
   const navigationTheme = useMemo(() => {
