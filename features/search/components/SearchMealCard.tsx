@@ -35,7 +35,7 @@ export default function SearchMealCard({ mealDetails }: SearchMealCardProps) {
     }
     const val = (3.5 + (hash % 15) / 10).toFixed(1);
     const time = 20 + (hash % 6) * 5;
-    return { rating: val, cookingTime: `${time} min` };
+    return { rating: val, cookingTime: `${time} mins` };
   }, [mealDetails?.idMeal]);
 
   if (!mealDetails) return null;

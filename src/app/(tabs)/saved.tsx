@@ -1,28 +1,40 @@
+import AppHeader from "@/components/AppHeader";
 import { useAtom } from "jotai";
-import { Text, View } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeColors } from "../../../constants/color-pallette";
+import SavedHeader from "../../../features/saved/components/SavedHeader";
+import SavedList from "../../../features/saved/components/SavedList";
 import { savedIdsAtom } from "../../../store/saved-store";
 
 const Saved = () => {
   const [ids] = useAtom(savedIdsAtom);
 
-  const { text: textColor } = useThemeColors();
+  const { background } = useThemeColors();
 
-  console.log(ids);
+  const idCount = ids.length;
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Animated.View entering={FadeIn.duration(1000)} exiting={FadeOut}>
-        <Text style={{ color: textColor }}>Appears with a fade</Text>
-        {ids.map((id) => (
-          <Text key={id} style={{ color: textColor }}>
-            {id}
-          </Text>
-        ))}
-      </Animated.View>
-    </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: background }}>
+      <View style={styles.wrapperContainer}>
+        <AppHeader />
+        <SavedHeader mealCount={idCount ?? 0} />
+        <SavedList ids={ids} />
+      </View>
+    </SafeAreaView>
   );
 };
 
 export default Saved;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  wrapperContainer: {
+    flex: 1,
+    paddingTop: 16,
+    paddingHorizontal: 16,
+    gap: 30,
+  },
+});
