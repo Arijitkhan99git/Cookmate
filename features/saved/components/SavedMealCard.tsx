@@ -8,9 +8,9 @@ import { Bookmark, Play, Timer } from "lucide-react-native";
 import { useMemo } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 import { Meal } from "../../../api/model/fetchMealById-model";
 import { useThemeColors } from "../../../constants/color-pallette";

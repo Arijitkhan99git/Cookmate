@@ -1,4 +1,3 @@
-import AppHeader from "@/components/AppHeader";
 import { useAtom } from "jotai";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,7 +16,7 @@ const Saved = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: background }}>
       <View style={styles.wrapperContainer}>
-        <AppHeader />
+        {/* <AppHeader /> */}
         <SavedHeader mealCount={idCount ?? 0} />
         <SavedList ids={ids} />
       </View>
@@ -35,6 +34,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 16,
     paddingHorizontal: 16,
-    gap: 30,
+    gap: 20,
   },
 });
