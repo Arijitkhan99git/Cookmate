@@ -1,17 +1,26 @@
+import { AppText } from "@/components/AppText";
+import { useRouter } from "expo-router";
 import { Search, Soup } from "lucide-react-native";
 import { useState } from "react";
-import { Platform, Pressable, StyleSheet, TextInput, View } from "react-native";
+import { Platform, Pressable, StyleSheet, View } from "react-native";
 import { useThemeColors } from "../../../constants/color-pallette";
 
 const HomeSearch = () => {
+  const router = useRouter();
+
   const [inputText, setInputText] = useState("");
   const { foreground, orangeGlow, primary, mutedText, isDarkMode } =
     useThemeColors();
 
   const iconColor = isDarkMode ? "#8E817A" : "#A07060";
 
+  const hanldeSearch = () => {
+    router.push({ pathname: "/(tabs)/search", params: { focus: "true" } });
+  };
+
   return (
-    <View
+    <Pressable
+      onPress={hanldeSearch}
       style={[
         styles.container,
         {
@@ -29,22 +38,16 @@ const HomeSearch = () => {
       />
 
       {/* Text input */}
-      <TextInput
-        style={[styles.input, { color: isDarkMode ? "#FFF8F2" : "#3D2B1F" }]}
-        placeholder="Let's cook something..."
-        placeholderTextColor={mutedText}
-        onChangeText={setInputText}
-        value={inputText}
-        returnKeyType="search"
-      />
+      <AppText style={[styles.input, { color: mutedText }]}>
+        Let's cook something...
+      </AppText>
 
       {/* Right search button */}
-      <Pressable
-        style={({ pressed }) => [
+      <View
+        style={[
           styles.searchButton,
           {
             backgroundColor: primary,
-            opacity: pressed ? 0.85 : 1,
             shadowColor: orangeGlow,
           },
         ]}
@@ -52,8 +55,8 @@ const HomeSearch = () => {
         accessibilityLabel="Search"
       >
         <Search color="#FFFFFF" size={20} strokeWidth={2.5} />
-      </Pressable>
-    </View>
+      </View>
+    </Pressable>
   );
 };
 
@@ -75,7 +78,7 @@ const styles = StyleSheet.create({
     elevation: Platform.OS === "android" ? 8 : 0,
   },
   leftIcon: {
-    marginRight: 10,
+    marginRight: 14,
   },
   input: {
     flex: 1,

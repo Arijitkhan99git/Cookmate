@@ -2,22 +2,23 @@ import { AppText } from "@/components/AppText";
 import EmptySearchState from "@/components/EmptySearchState";
 import ErrorState from "@/components/ErrorState";
 import { LinearGradient } from "expo-linear-gradient";
+import { useFocusEffect } from "expo-router";
 import { useAtomValue } from "jotai";
 import {
-    ChevronDown,
-    Lightbulb,
-    Search,
-    SlidersHorizontal,
-    X,
+  ChevronDown,
+  Lightbulb,
+  Search,
+  SlidersHorizontal,
+  X,
 } from "lucide-react-native";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
-    FlatList,
-    Platform,
-    Pressable,
-    StyleSheet,
-    TextInput,
-    View,
+  FlatList,
+  Platform,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
 } from "react-native";
 import { useSearchMealByFLetter } from "../../../api/hooks/useSearchMealByFletter";
 import { useThemeColors } from "../../../constants/color-pallette";
@@ -33,11 +34,13 @@ const SearchInputWithFilter = ({
   onChangeQuery,
   setModalVisible,
   activeFilterCount,
+  inputRef,
 }: {
   query: string;
   onChangeQuery: (text: string) => void;
   setModalVisible: (visible: boolean) => void;
   activeFilterCount: number;
+  inputRef?: React.Ref<TextInput>;
 }) => {
   const { foreground, primary, mutedText, isDarkMode, orangeGlow } =
     useThemeColors();
@@ -72,6 +75,7 @@ const SearchInputWithFilter = ({
 
         {/* Text Input */}
         <TextInput
+          ref={inputRef}
           style={[styles.input, { color: isDarkMode ? "#FFF8F2" : "#3D2B1F" }]}
           placeholder="Let's cook something..."
           placeholderTextColor={mutedText}
@@ -169,10 +173,28 @@ const ChefHackCard = () => {
   );
 };
 
-export const SearchList = () => {
+export const SearchList = ({ autoFocus = false }: { autoFocus?: boolean }) => {
+  const inputRef = useRef<TextInput>(null);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const selectedCategories = useAtomValue(selectedCategoriesAtom);
+
+  useFocusEffect(
+    useCallback(() => {
+      let timer: NodeJS.Timeout;
+
+      if (autoFocus) {
+        timer = setTimeout(() => {
+          inputRef.current?.focus();
+        }, 250);
+      }
+
+      return () => {
+        if (timer) clearTimeout(timer);
+      };
+    }, [autoFocus]),
+  );
 
   // Fetch data using searchMealByFLetter("c")
   const {
@@ -217,6 +239,7 @@ export const SearchList = () => {
   return (
     <View style={{ flex: 1 }}>
       <SearchInputWithFilter
+        inputRef={inputRef}
         query={searchQuery}
         onChangeQuery={setSearchQuery}
         setModalVisible={setIsModalVisible}
