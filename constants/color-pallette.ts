@@ -18,7 +18,7 @@ export const Colors = {
     // Surfaces
     background: "#fbf3ebff",
     foreground: "#FFFFFF",
-    surface: "#FFFFFF",
+    surface: "#de8864ff",
     surfaceSecondary: "#FFF2E8",
     surfaceSubtle: "#F6EFE9",
     surfaceHigh: "#FFFFFF",
@@ -66,7 +66,7 @@ export const Colors = {
     // Surfaces
     background: "#171311",
     foreground: "#29201C",
-    surface: "#29201C",
+    surface: "#b95428ff",
     surfaceSecondary: "#211A17",
     surfaceSubtle: "#30251F",
     surfaceHigh: "#3D302A",

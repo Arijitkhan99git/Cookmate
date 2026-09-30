@@ -1,6 +1,18 @@
 import AppHeader from "@/components/AppHeader";
 import { AppText } from "@/components/AppText";
 import { useAtom } from "jotai";
+import {
+  Bandage,
+  BellRing,
+  CircleGauge,
+  HelpCircle,
+  LogOut,
+  Moon,
+  Palette,
+  Ruler,
+  ShoppingCart,
+  Sun,
+} from "lucide-react-native";
 import React, { useRef, useState } from "react";
 import {
   Animated,
@@ -14,35 +26,15 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeColors } from "../../../constants/color-pallette";
+import { useGenericShadow } from "../../../constants/genericShadowStyle";
 import { fonts } from "../../../constants/typography";
+import MileStonesCard from "../../../features/profile/components/MileStonesCard";
+import ProfileCard from "../../../features/profile/components/ProfileCard";
+import { SectionHeader } from "../../../features/profile/components/SectionHeader";
 import {
   setStoredThemePreference,
   themeAtom,
 } from "../../../store/theme-store";
-
-// ─── Types ──────────────────────────────────────────────────────────────────
-
-type MilestoneStatus = "active" | "unlocked" | "locked";
-
-interface Milestone {
-  icon: string;
-  label: string;
-  badge: string;
-  status: MilestoneStatus;
-}
-
-// ─── Static Data ─────────────────────────────────────────────────────────────
-
-const MILESTONES: Milestone[] = [
-  {
-    icon: "🍳",
-    label: "Master of\nSearing",
-    badge: "Bronze",
-    status: "unlocked",
-  },
-  { icon: "🔥", label: "30-Day Streak", badge: "Active", status: "active" },
-  { icon: "🍝", label: "Pasta Artisan", badge: "Silver", status: "unlocked" },
-];
 
 const DIETARY_TAGS = ["High Protein", "Low Carb", "Pescatarian"];
 
@@ -55,7 +47,7 @@ function DietTag({ label, primary }: { label: string; primary: boolean }) {
       style={{
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: primary ? colors.primary : colors.muted,
+        backgroundColor: primary ? colors.surface : colors.muted,
         paddingHorizontal: 12,
         paddingVertical: 5,
         borderRadius: 20,
@@ -76,47 +68,6 @@ function DietTag({ label, primary }: { label: string; primary: boolean }) {
   );
 }
 
-function SectionHeader({
-  title,
-  right,
-  onRightPress,
-}: {
-  title: string;
-  right?: string;
-  onRightPress?: () => void;
-}) {
-  const colors = useThemeColors();
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        marginBottom: 14,
-      }}
-    >
-      <AppText
-        style={{ fontSize: 16, fontFamily: fonts.semibold, color: colors.text }}
-      >
-        {title}
-      </AppText>
-      {right && (
-        <TouchableOpacity onPress={onRightPress} activeOpacity={0.7}>
-          <AppText
-            style={{
-              fontSize: 13,
-              color: colors.primary,
-              fontFamily: fonts.medium,
-            }}
-          >
-            {right}
-          </AppText>
-        </TouchableOpacity>
-      )}
-    </View>
-  );
-}
-
 function SectionCard({ children }: { children: React.ReactNode }) {
   const colors = useThemeColors();
   return (
@@ -133,90 +84,17 @@ function SectionCard({ children }: { children: React.ReactNode }) {
   );
 }
 
-function MilestoneCard({ item }: { item: Milestone }) {
-  const colors = useThemeColors();
-  const isActive = item.status === "active";
-  const isLocked = item.status === "locked";
-
-  const badgeColor = isActive
-    ? colors.primary
-    : isLocked
-      ? colors.muted
-      : colors.rating;
-
-  const badgeTextColor = isActive
-    ? "#fff"
-    : isLocked
-      ? colors.textSecondary
-      : "#fff";
-
-  return (
-    <View
-      style={{
-        alignItems: "center",
-        flex: 1,
-        gap: 6,
-        opacity: isLocked ? 0.45 : 1,
-      }}
-    >
-      <View
-        style={{
-          width: 62,
-          height: 62,
-          borderRadius: 16,
-          backgroundColor: isActive
-            ? `${colors.primary}18`
-            : colors.surfaceSubtle,
-          alignItems: "center",
-          justifyContent: "center",
-          borderWidth: isActive ? 2 : 1,
-          borderColor: isActive ? colors.primary : colors.border,
-        }}
-      >
-        <AppText style={{ fontSize: 26 }}>{item.icon}</AppText>
-      </View>
-      <AppText
-        style={{
-          fontSize: 11,
-          textAlign: "center",
-          color: colors.text,
-          fontFamily: fonts.medium,
-          lineHeight: 15,
-        }}
-      >
-        {item.label}
-      </AppText>
-      <View
-        style={{
-          backgroundColor: badgeColor,
-          paddingHorizontal: 9,
-          paddingVertical: 2,
-          borderRadius: 10,
-        }}
-      >
-        <AppText
-          style={{
-            fontSize: 10,
-            color: badgeTextColor,
-            fontFamily: fonts.semibold,
-          }}
-        >
-          {item.badge}
-        </AppText>
-      </View>
-    </View>
-  );
-}
-
 function SettingsRow({
   icon,
+  iconBg,
   label,
   subtitle,
   right,
   onPress,
   showBorder = true,
 }: {
-  icon: string;
+  icon: React.ReactNode;
+  iconBg?: string;
   label: string;
   subtitle?: string;
   right?: React.ReactNode;
@@ -242,12 +120,12 @@ function SettingsRow({
           width: 38,
           height: 38,
           borderRadius: 12,
-          backgroundColor: colors.surfaceSubtle,
+          backgroundColor: iconBg || colors.surfaceSubtle,
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <AppText style={{ fontSize: 18 }}>{icon}</AppText>
+        {icon}
       </View>
       <View style={{ flex: 1 }}>
         <AppText
@@ -276,6 +154,7 @@ function LogOutButton() {
   const colors = useThemeColors();
   const scale = useRef(new Animated.Value(1)).current;
   const opacity = useRef(new Animated.Value(1)).current;
+  const shadowStyle = useGenericShadow(1);
 
   const handlePressIn = () => {
     Animated.parallel([
@@ -308,19 +187,20 @@ function LogOutButton() {
       <Pressable
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-          paddingVertical: 14,
-          borderRadius: 16,
-          borderWidth: 1.5,
-          borderColor: colors.borderAccent,
-          backgroundColor: colors.surfaceSubtle,
-        }}
+        style={[
+          shadowStyle,
+          {
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            paddingVertical: 14,
+            borderRadius: 16,
+            backgroundColor: colors.card,
+          },
+        ]}
       >
-        <AppText style={{ fontSize: 16 }}>↪️</AppText>
+        <LogOut color={colors.primary} />
         <AppText
           style={{
             fontSize: 15,
@@ -497,172 +377,12 @@ export default function Profile() {
           <AppHeader />
         </View>
 
-        <View style={{ paddingHorizontal: 16 }}>
+        <View style={{ paddingHorizontal: 16, gap: 18 }}>
           {/* ── Profile Card ──────────────────────────────────── */}
-          <SectionCard>
-            <View style={{ alignItems: "center", gap: 6 }}>
-              {/* Avatar */}
-              <View style={{ position: "relative", marginBottom: 4 }}>
-                <View
-                  style={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: 40,
-                    backgroundColor: colors.surfaceAccent,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderWidth: 3,
-                    borderColor: colors.primary,
-                  }}
-                >
-                  <AppText style={{ fontSize: 36 }}>👨‍🍳</AppText>
-                </View>
-                <View
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    right: 0,
-                    width: 24,
-                    height: 24,
-                    borderRadius: 12,
-                    backgroundColor: colors.primary,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderWidth: 2,
-                    borderColor: colors.card,
-                  }}
-                >
-                  <AppText style={{ fontSize: 11 }}>📷</AppText>
-                </View>
-              </View>
-
-              {/* Name + Pro badge */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
-                <AppText
-                  style={{
-                    fontSize: 22,
-                    fontFamily: fonts.bold,
-                    color: colors.text,
-                  }}
-                >
-                  Arijit
-                </AppText>
-                <View
-                  style={{
-                    backgroundColor: colors.primary,
-                    paddingHorizontal: 8,
-                    paddingVertical: 2,
-                    borderRadius: 8,
-                  }}
-                >
-                  <AppText
-                    style={{
-                      color: "#fff",
-                      fontSize: 10,
-                      fontFamily: fonts.bold,
-                    }}
-                  >
-                    PRO
-                  </AppText>
-                </View>
-              </View>
-
-              <AppText style={{ fontSize: 13, color: colors.textSecondary }}>
-                Culinary Enthusiast & Home Cook
-              </AppText>
-
-              {/* Level badge */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 5,
-                  backgroundColor: colors.surfaceSubtle,
-                  paddingHorizontal: 12,
-                  paddingVertical: 5,
-                  borderRadius: 20,
-                  borderWidth: 1,
-                  borderColor: colors.border,
-                }}
-              >
-                <AppText style={{ fontSize: 13 }}>🏅</AppText>
-                <AppText
-                  style={{
-                    fontSize: 12,
-                    color: colors.primary,
-                    fontFamily: fonts.semibold,
-                  }}
-                >
-                  Level 4 Gourmet
-                </AppText>
-              </View>
-
-              {/* Stats row */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  width: "100%",
-                  marginTop: 12,
-                  borderTopWidth: StyleSheet.hairlineWidth,
-                  borderTopColor: colors.border,
-                  paddingTop: 14,
-                }}
-              >
-                {[
-                  { value: "18", label: "Saved" },
-                  { value: "42", label: "Cooked", highlight: true },
-                  { value: "12", label: "Custom" },
-                  { value: "4.9★", label: "Rating" },
-                ].map((stat, i, arr) => (
-                  <View
-                    key={stat.label}
-                    style={{
-                      flex: 1,
-                      alignItems: "center",
-                      borderRightWidth:
-                        i < arr.length - 1 ? StyleSheet.hairlineWidth : 0,
-                      borderRightColor: colors.border,
-                    }}
-                  >
-                    <AppText
-                      style={{
-                        fontSize: 20,
-                        fontFamily: fonts.bold,
-                        color: stat.highlight ? colors.primary : colors.text,
-                      }}
-                    >
-                      {stat.value}
-                    </AppText>
-                    <AppText
-                      style={{
-                        fontSize: 11,
-                        color: colors.textSecondary,
-                        marginTop: 2,
-                      }}
-                    >
-                      {stat.label}
-                    </AppText>
-                  </View>
-                ))}
-              </View>
-            </View>
-          </SectionCard>
+          <ProfileCard />
 
           {/* ── Cooking Milestones ────────────────────────────── */}
-          <SectionCard>
-            <SectionHeader title="Cooking Milestones" right="3 Unlocked" />
-            <View style={{ flexDirection: "row", gap: 8 }}>
-              {MILESTONES.map((m) => (
-                <MilestoneCard key={m.label} item={m} />
-              ))}
-            </View>
-          </SectionCard>
+          <MileStonesCard />
 
           {/* ── Cooking Preferences ───────────────────────────── */}
           <SectionCard>
@@ -680,7 +400,7 @@ export default function Profile() {
                 marginBottom: 14,
               }}
             >
-              <AppText style={{ fontSize: 18 }}>🎯</AppText>
+              <CircleGauge size={20} color={colors.surface} />
               <View>
                 <AppText
                   style={{
@@ -728,16 +448,21 @@ export default function Profile() {
 
             {/* Appearance */}
             <SettingsRow
-              icon="🎨"
+              icon={
+                <Palette size={20} color={isDark ? "#ffb4a6" : "#c44c33"} />
+              }
+              iconBg={isDark ? "#3d221c" : "#ffe4df"}
               label="Appearance"
               subtitle="Switch light & dark tone"
               right={
                 <View
                   style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
                 >
-                  <AppText style={{ fontSize: 16 }}>
-                    {isDark ? "🌙" : "☀️"}
-                  </AppText>
+                  {isDark ? (
+                    <Moon size={20} color={colors.textSecondary} />
+                  ) : (
+                    <Sun size={20} color={colors.textSecondary} />
+                  )}
                   <Switch
                     trackColor={{
                       false: colors.muted,
@@ -748,7 +473,7 @@ export default function Profile() {
                     onValueChange={toggleTheme}
                     value={isDark}
                     style={{
-                      transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }],
+                      transform: [{ scaleX: 1.0 }, { scaleY: 1.0 }],
                     }}
                   />
                 </View>
@@ -757,7 +482,8 @@ export default function Profile() {
 
             {/* Measurement Unit */}
             <SettingsRow
-              icon="📏"
+              icon={<Ruler size={20} color={isDark ? "#ffd382" : "#b57d16"} />}
+              iconBg={isDark ? "#403114" : "#ffebd1"}
               label="Measurement Unit"
               subtitle="Recipe ingredient metrics"
               right={
@@ -778,7 +504,7 @@ export default function Profile() {
                         paddingHorizontal: 10,
                         paddingVertical: 5,
                         backgroundColor:
-                          measureUnit === u ? colors.primary : "transparent",
+                          measureUnit === u ? colors.surface : "transparent",
                       }}
                     >
                       <AppText
@@ -799,7 +525,10 @@ export default function Profile() {
 
             {/* Cook Alerts & Daily Inspos */}
             <SettingsRow
-              icon="🔔"
+              icon={
+                <BellRing size={20} color={isDark ? "#ff9c9c" : "#d13838"} />
+              }
+              iconBg={isDark ? "#3d1e1e" : "#ffe0e0"}
               label="Cook Alerts & Daily Inspos"
               subtitle="Timers, rest times, dinner picks"
               right={
@@ -812,14 +541,17 @@ export default function Profile() {
                   ios_backgroundColor={colors.muted}
                   onValueChange={setCookAlerts}
                   value={cookAlerts}
-                  style={{ transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }] }}
+                  style={{ transform: [{ scaleX: 1 }, { scaleY: 1 }] }}
                 />
               }
             />
 
             {/* Allergens & Exclusions */}
             <SettingsRow
-              icon="🚫"
+              icon={
+                <Bandage size={20} color={isDark ? "#e0b094" : "#a86c48"} />
+              }
+              iconBg={isDark ? "#36261d" : "#faeadf"}
               label="Allergens & Exclusions"
               subtitle="No Shellfish, Peanuts filtered"
               onPress={() => setAllergenSelected((v) => !v)}
@@ -848,7 +580,13 @@ export default function Profile() {
 
             {/* Grocery Auto-Sync */}
             <SettingsRow
-              icon="🛒"
+              icon={
+                <ShoppingCart
+                  size={20}
+                  color={isDark ? "#a1d48c" : "#4a8a31"}
+                />
+              }
+              iconBg={isDark ? "#24361c" : "#eaf7e4"}
               label="Grocery Auto-Sync"
               subtitle="Apple Reminders, Instacart"
               onPress={() => setGrocerySelected((v) => !v)}
@@ -877,7 +615,10 @@ export default function Profile() {
 
             {/* Help & Privacy */}
             <SettingsRow
-              icon="🛡️"
+              icon={
+                <HelpCircle size={20} color={isDark ? "#9caeff" : "#3b54ba"} />
+              }
+              iconBg={isDark ? "#21263d" : "#e4e8ff"}
               label="Help & Privacy"
               subtitle="Community guidelines & support"
               showBorder={false}
@@ -926,7 +667,7 @@ export default function Profile() {
                 fontFamily: fonts.light,
               }}
             >
-              Crafted with warmth for home cooks everywhere 🍳
+              Crafted with warmth for home cooks everywhere
             </AppText>
           </View>
         </View>
