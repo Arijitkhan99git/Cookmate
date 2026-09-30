@@ -21,7 +21,7 @@ const LABELS: Record<string, string> = {
 
 export function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const { foreground, surfaceSubtle, orangeGlow, isDarkMode } =
+  const { foreground, surfaceSubtle, orangeGlow, isDarkMode, border } =
     useThemeColors();
 
   const inactiveColor = isDarkMode ? "#aca19bff" : "#705E54";
@@ -37,6 +37,7 @@ export function CustomTabBar({ state, navigation }: BottomTabBarProps) {
           bottom: Math.max(insets.bottom + 8, 20),
           backgroundColor: foreground,
           shadowColor: isDarkMode ? "#000000" : "#C08060",
+          borderColor: border,
         },
       ]}
     >
@@ -109,6 +110,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 70,
     borderRadius: 35,
+    borderWidth: 1,
     paddingHorizontal: 6,
     // iOS outer shadow
     shadowOffset: { width: 0, height: 6 },
@@ -126,9 +128,9 @@ const styles = StyleSheet.create({
   pill: {
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 9,
+    paddingVertical: 8,
     paddingHorizontal: 14,
-    borderRadius: 30,
+    borderRadius: 40,
     gap: 2,
     minWidth: 80,
     overflow: "hidden",
