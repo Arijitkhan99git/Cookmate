@@ -15,7 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeColors } from "../../constants/color-pallette";
 import { getStoredSavedIds, savedIdsAtom } from "../../store/saved-store";
 import { getStoredThemePreference, themeAtom } from "../../store/theme-store";
-import WelcomingScreen from "../components/WelcomingScreen";
+import WelcomingScreen from "../components/welcomeScreen/WelcomingScreen";
 
 onlineManager.setEventListener((setOnline) => {
   let initialised = false;
@@ -116,15 +116,10 @@ export default function RootLayout() {
   // Show welcome screen on first launch
   if (!welcomeSeen) {
     return (
-      <SafeAreaView
-        edges={["top"]}
-        style={{ flex: 1, backgroundColor: colors.background }}
-      >
-        <WelcomingScreen
-        // onStart={handleStart}
-        />
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <WelcomingScreen onStart={handleStart} />
         <StatusBar style={colors.isDarkMode ? "light" : "dark"} />
-      </SafeAreaView>
+      </View>
     );
   }
 
