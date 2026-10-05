@@ -21,20 +21,26 @@ const LABELS: Record<string, string> = {
 
 export function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const { foreground, surfaceSubtle, orangeGlow, isDarkMode, border } =
-    useThemeColors();
+  const { foreground, orangeGlow, isDarkMode, border } = useThemeColors();
 
   const inactiveColor = isDarkMode ? "#aca19bff" : "#705E54";
   // Active pill bg is slightly off from the tab bar bg so it's visible
   const activePillBg = isDarkMode ? "#3D302A" : "#f9f7f5ff";
   const activeShadow = isDarkMode ? "#000000" : "#D4784A";
 
+  const getBottom = () => {
+    if (Platform.OS === "ios") {
+      return 25;
+    }
+    return Math.max(insets.bottom + 8, 20);
+  };
+
   return (
     <View
       style={[
         styles.container,
         {
-          bottom: Math.max(insets.bottom + 8, 20),
+          bottom: getBottom(),
           backgroundColor: foreground,
           shadowColor: isDarkMode ? "#000000" : "#C08060",
           borderColor: border,

@@ -1,6 +1,7 @@
 import { AppText } from "@/components/AppText";
 import EmptySearchState from "@/components/EmptySearchState";
 import ErrorState from "@/components/ErrorState";
+import { useScreenSafeArea } from "@/hooks/useScreenSafeArea";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import {
@@ -11,7 +12,7 @@ import {
   UtensilsCrossed,
   X,
 } from "lucide-react-native";
-import React, { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -22,7 +23,6 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useFetchAllCategories } from "../../../api/hooks/useCategories";
 import { useFetchRandomMeal } from "../../../api/hooks/useRandomMeal";
 import { Category } from "../../../api/model/categories-model";
@@ -323,6 +323,7 @@ export default function AllCategoriesScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
 
+  const screenSafeArea = useScreenSafeArea();
   const { background } = useThemeColors();
 
   // Fetch categories from API
@@ -436,10 +437,11 @@ export default function AllCategoriesScreen() {
     [filteredCategories.length, handleSurpriseMe, isSurpriseLoading],
   );
 
+
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: background }]}>
+    <View style={screenSafeArea}>
       <TopNavBar onBack={handleBack} />
 
       {isLoading ? (
@@ -488,7 +490,7 @@ export default function AllCategoriesScreen() {
           windowSize={5}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 

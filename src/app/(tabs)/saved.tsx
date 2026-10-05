@@ -1,26 +1,24 @@
+import { useScreenSafeArea } from "@/hooks/useScreenSafeArea";
 import { useAtom } from "jotai";
 import { StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useThemeColors } from "../../../constants/color-pallette";
 import SavedHeader from "../../../features/saved/components/SavedHeader";
 import SavedList from "../../../features/saved/components/SavedList";
 import { savedIdsAtom } from "../../../store/saved-store";
 
 const Saved = () => {
   const [ids] = useAtom(savedIdsAtom);
-
-  const { background } = useThemeColors();
+  const screenSafeArea = useScreenSafeArea();
 
   const idCount = ids.length;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: background }}>
+    <View style={[screenSafeArea, styles.container]}>
       <View style={styles.wrapperContainer}>
         {/* <AppHeader /> */}
         <SavedHeader mealCount={idCount ?? 0} />
         <SavedList ids={ids} />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

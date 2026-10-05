@@ -8,7 +8,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import { ChevronLeft } from "lucide-react-native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useFetchMealById } from "../../../api/hooks/useFetchMealById";
 import { useThemeColors } from "../../../constants/color-pallette";
 import { useGenericShadow } from "../../../constants/genericShadowStyle";
@@ -18,9 +17,12 @@ import MealIngredients from "../../../features/mealDeatils/MealIngredients";
 import PreparationSteps from "../../../features/mealDeatils/PreparationSteps";
 import RecipeStats from "../../../features/mealDeatils/RecipeStats";
 import WatchRecipe from "../../../features/mealDeatils/WatchRecipe";
+import { useScreenSafeArea } from "../../hooks/useScreenSafeArea";
 import MealDetailsSkeleton from "./mealDetailsSkeleton";
 
 const MealDetailScreen = () => {
+  const screenSafeArea = useScreenSafeArea();
+
   const {
     text: textColor,
     background,
@@ -66,159 +68,157 @@ const MealDetailScreen = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: background }}>
-      <View style={{ flex: 1 }}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingBottom: 100,
+    <View style={screenSafeArea}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: 100,
+        }}
+      >
+        {/* Navigation Header */}
+        <View style={[styles.navigationHeader]}>
+          <Pressable
+            onPress={() => router.back()}
+            style={({ pressed }) => [
+              styles.pressableHeader,
+              {
+                opacity: pressed ? 0.6 : 1,
+                transform: [{ scale: pressed ? 0.95 : 1 }],
+              },
+            ]}
+          >
+            <ChevronLeft size={24} color={textColor} />
+            <AppText
+              style={{
+                color: textColor,
+                fontSize: 18,
+                fontFamily: fonts.bold,
+              }}
+            >
+              Recipe Details
+            </AppText>
+          </Pressable>
+          <CommonBookmark mealId={id} />
+        </View>
+        {/* Image section  */}
+        <View
+          style={{
+            width: "100%",
+            height: 280,
+            borderBottomLeftRadius: 30,
+            borderBottomRightRadius: 30,
+            overflow: "hidden",
           }}
         >
-          {/* Navigation Header */}
-          <View style={[styles.navigationHeader]}>
-            <Pressable
-              onPress={() => router.back()}
-              style={({ pressed }) => [
-                styles.pressableHeader,
-                {
-                  opacity: pressed ? 0.6 : 1,
-                  transform: [{ scale: pressed ? 0.95 : 1 }],
-                },
-              ]}
-            >
-              <ChevronLeft size={24} color={textColor} />
-              <AppText
-                style={{
-                  color: textColor,
-                  fontSize: 18,
-                  fontFamily: fonts.bold,
-                }}
-              >
-                Recipe Details
-              </AppText>
-            </Pressable>
-            <CommonBookmark mealId={id} />
-          </View>
-          {/* Image section  */}
+          <Image
+            source={{ uri: imageUrl }}
+            style={{ width: "100%", height: "100%" }}
+            contentFit="cover"
+          />
+        </View>
+
+        {/* Meal info section */}
+        <View
+          style={{
+            position: "relative",
+          }}
+        >
+          {/* Meal Overview */}
           <View
-            style={{
-              width: "100%",
-              height: 280,
-              borderBottomLeftRadius: 30,
-              borderBottomRightRadius: 30,
-              overflow: "hidden",
-            }}
+            style={[
+              styles.mealInfoWrapper,
+              shadowStyle,
+              {
+                backgroundColor: card,
+              },
+            ]}
           >
-            <Image
-              source={{ uri: imageUrl }}
-              style={{ width: "100%", height: "100%" }}
-              contentFit="cover"
-            />
-          </View>
+            {/* Rating row*/}
 
-          {/* Meal info section */}
-          <View
-            style={{
-              position: "relative",
-            }}
-          >
-            {/* Meal Overview */}
-            <View
-              style={[
-                styles.mealInfoWrapper,
-                shadowStyle,
-                {
-                  backgroundColor: card,
-                },
-              ]}
-            >
-              {/* Rating row*/}
+            <View style={styles.ratingRow}>
+              <RatingBadge />
+              <NormalBadge badgeTitle="EDITOR'S PICK" />
+            </View>
 
-              <View style={styles.ratingRow}>
-                <RatingBadge />
-                <NormalBadge badgeTitle="EDITOR'S PICK" />
-              </View>
-
-              {/* Tags */}
-              {/* <View style={{ flexDirection: "row", gap: 10, flexWrap: "wrap" }}>
+            {/* Tags */}
+            {/* <View style={{ flexDirection: "row", gap: 10, flexWrap: "wrap" }}>
                 {tags.map((tag) => (
                   <NormalBadge badgeTitle={tag} key={tag} />
                 ))}
               </View> */}
 
-              {/* Title section  */}
-              <View>
-                <AppText
-                  style={{
-                    fontSize: 22,
-                    fontWeight: "800",
-                    color: textColor,
-                  }}
-                >
-                  {mealDetails?.strMeal}
-                </AppText>
+            {/* Title section  */}
+            <View>
+              <AppText
+                style={{
+                  fontSize: 22,
+                  fontWeight: "800",
+                  color: textColor,
+                }}
+              >
+                {mealDetails?.strMeal}
+              </AppText>
 
-                <View style={{ marginVertical: 8 }}>
+              <View style={{ marginVertical: 8 }}>
+                <Text
+                  style={[
+                    styles.descriptionText,
+                    {
+                      color: textColor,
+                    },
+                  ]}
+                  numberOfLines={3}
+                >
+                  {mealDetails?.strInstructions}
+                </Text>
+                <Pressable>
                   <Text
                     style={[
                       styles.descriptionText,
                       {
-                        color: textColor,
+                        color: danger,
+                        fontFamily: fonts.medium,
                       },
                     ]}
-                    numberOfLines={3}
                   >
-                    {mealDetails?.strInstructions}
+                    Read more
                   </Text>
-                  <Pressable>
-                    <Text
-                      style={[
-                        styles.descriptionText,
-                        {
-                          color: danger,
-                          fontFamily: fonts.medium,
-                        },
-                      ]}
-                    >
-                      Read more
-                    </Text>
-                  </Pressable>
-                </View>
+                </Pressable>
               </View>
-
-              {/* stats section  */}
-              <RecipeStats cuisineType={mealDetails?.strArea ?? ""} />
             </View>
 
-            {/* Meal Blog Link */}
-            {blogUrl?.trim() ? (
-              <MealBlogLinkCard
-                blogUrl={blogUrl}
-                cardBg={card}
-                textColor={textColor}
-                secondaryTextColor={secondaryText}
-                successColor={success}
-                isDarkMode={isDarkMode}
-                surfaceHighColor={surfaceHigh}
-                shadowStyle={blogShadow}
-              />
-            ) : null}
+            {/* stats section  */}
+            <RecipeStats cuisineType={mealDetails?.strArea ?? ""} />
           </View>
 
-          {/* Watch Recipe Section */}
-          <WatchRecipe
-            videoUrl={mealDetails?.strYoutube ?? null}
-            imageUrl={mealDetails?.strMealThumb}
-          />
+          {/* Meal Blog Link */}
+          {blogUrl?.trim() ? (
+            <MealBlogLinkCard
+              blogUrl={blogUrl}
+              cardBg={card}
+              textColor={textColor}
+              secondaryTextColor={secondaryText}
+              successColor={success}
+              isDarkMode={isDarkMode}
+              surfaceHighColor={surfaceHigh}
+              shadowStyle={blogShadow}
+            />
+          ) : null}
+        </View>
 
-          {/* Ingredients List */}
-          <MealIngredients mealDetails={mealDetails} />
+        {/* Watch Recipe Section */}
+        <WatchRecipe
+          videoUrl={mealDetails?.strYoutube ?? null}
+          imageUrl={mealDetails?.strMealThumb}
+        />
 
-          {/* Preparation Steps */}
-          <PreparationSteps instructions={mealDetails?.strInstructions ?? ""} />
-        </ScrollView>
-      </View>
-    </SafeAreaView>
+        {/* Ingredients List */}
+        <MealIngredients mealDetails={mealDetails} />
+
+        {/* Preparation Steps */}
+        <PreparationSteps instructions={mealDetails?.strInstructions ?? ""} />
+      </ScrollView>
+    </View>
   );
 };
 

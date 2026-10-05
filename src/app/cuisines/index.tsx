@@ -1,28 +1,28 @@
 import { AppText } from "@/components/AppText";
 import ErrorState from "@/components/ErrorState";
+import { useScreenSafeArea } from "@/hooks/useScreenSafeArea";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import {
-    ArrowLeft,
-    Globe,
-    MapPin,
-    Search,
-    UtensilsCrossed,
-    X,
+  ArrowLeft,
+  Globe,
+  MapPin,
+  Search,
+  UtensilsCrossed,
+  X,
 } from "lucide-react-native";
 import { memo, useCallback, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    TextInput,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useFetchMealsByAreasLists } from "../../../api/hooks/useListAllAreas";
 import { useThemeColors } from "../../../constants/color-pallette";
 import { useGenericShadow } from "../../../constants/genericShadowStyle";
@@ -263,6 +263,7 @@ const EmptyState = memo(
 export default function AllCuisinesScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const screenSafeArea = useScreenSafeArea();
 
   const { background, primary } = useThemeColors();
 
@@ -304,8 +305,9 @@ export default function AllCuisinesScreen() {
     [areaData.length, isMealsLoading, searchQuery, handleClearSearch],
   );
 
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: background }]}>
+    <View style={screenSafeArea}>
       <TopNavBar onBack={handleBack} />
 
       {isMealsLoading ? (
@@ -354,7 +356,7 @@ export default function AllCuisinesScreen() {
           windowSize={5}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 

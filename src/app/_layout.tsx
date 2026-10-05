@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   onlineManager,
   QueryClient,
@@ -8,11 +9,13 @@ import * as Network from "expo-network";
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useAtom } from "jotai";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Platform, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeColors } from "../../constants/color-pallette";
 import { getStoredSavedIds, savedIdsAtom } from "../../store/saved-store";
 import { getStoredThemePreference, themeAtom } from "../../store/theme-store";
+import WelcomingScreen from "../components/WelcomingScreen";
 
 onlineManager.setEventListener((setOnline) => {
   let initialised = false;
@@ -67,6 +70,22 @@ export default function RootLayout() {
     getStoredSavedIds().then(setSavedIds);
   }, []);
 
+  // ── Welcome screen gate ───────────────────────────────────────────
+  // Default false = show welcome screen immediately (no black screen).
+  // AsyncStorage check upgrades to true for returning users.
+  const [welcomeSeen, setWelcomeSeen] = useState(false);
+
+  useEffect(() => {
+    AsyncStorage.getItem("cookmate-welcome-seen").then((val) => {
+      if (val === "true") setWelcomeSeen(true);
+    });
+  }, []);
+
+  const handleStart = async () => {
+    await AsyncStorage.setItem("cookmate-welcome-seen", "true");
+    setWelcomeSeen(true);
+  };
+
   const navigationTheme = useMemo(() => {
     const base = colors.isDarkMode ? DarkTheme : DefaultTheme;
     return {
@@ -91,12 +110,30 @@ export default function RootLayout() {
     "sans-light": require("@/assets/fonts/PlusJakartaSans-Light.ttf"),
   });
 
-  // In _layout.tsx
+  // Wait for both fonts and the AsyncStorage check to complete
   if (!fontsLoaded) return null;
+
+  // Show welcome screen on first launch
+  if (!welcomeSeen) {
+    return (
+      <SafeAreaView
+        edges={["top"]}
+        style={{ flex: 1, backgroundColor: colors.background }}
+      >
+        <WelcomingScreen
+        // onStart={handleStart}
+        />
+        <StatusBar style={colors.isDarkMode ? "light" : "dark"} />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <SafeAreaView
+        edges={["top"]}
+        style={{ flex: 1, backgroundColor: colors.background }}
+      >
         <ThemeProvider value={navigationTheme}>
           <Stack
             screenOptions={{
@@ -107,7 +144,7 @@ export default function RootLayout() {
           </Stack>
         </ThemeProvider>
         <StatusBar style={colors.isDarkMode ? "light" : "dark"} />
-      </View>
+      </SafeAreaView>
     </QueryClientProvider>
   );
 }

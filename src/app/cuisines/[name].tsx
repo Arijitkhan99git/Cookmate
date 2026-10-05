@@ -1,17 +1,17 @@
 import { AppText } from "@/components/AppText";
 import ErrorState from "@/components/ErrorState";
+import { useScreenSafeArea } from "@/hooks/useScreenSafeArea";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowLeft, Globe } from "lucide-react-native";
 import { memo, useCallback } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Pressable,
-    StyleSheet,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useFetchMealsByArea } from "../../../api/hooks/useFetchMealByArea";
 import { Meal } from "../../../api/model/filterByArea-model";
 import { CategoryMeal } from "../../../api/model/listMealsByCategory";
@@ -126,6 +126,8 @@ const CuisineMealHeader = memo(
 
 export default function CuisineMealsScreen() {
   const router = useRouter();
+  const screenSafeArea = useScreenSafeArea();
+
   const { name, thumb } = useLocalSearchParams<{
     name: string;
     thumb?: string;
@@ -157,7 +159,7 @@ export default function CuisineMealsScreen() {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: background }]}>
+    <View style={screenSafeArea}>
       {isLoading ? (
         <View style={styles.flex}>
           <View style={styles.loadingHeaderWrapper}>{listHeader}</View>
@@ -193,7 +195,7 @@ export default function CuisineMealsScreen() {
           windowSize={6}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 

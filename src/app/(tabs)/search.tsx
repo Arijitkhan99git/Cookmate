@@ -1,21 +1,20 @@
 import AppHeader from "@/components/AppHeader";
+import { useScreenSafeArea } from "@/hooks/useScreenSafeArea";
 import { useLocalSearchParams } from "expo-router";
 import { StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useThemeColors } from "../../../constants/color-pallette";
 import { SearchList } from "../../../features/search/components/SearchList";
 
 const Search = () => {
-  const { background } = useThemeColors();
   const { focus } = useLocalSearchParams<{ focus?: string }>();
+  const screenSafeArea = useScreenSafeArea();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: background }}>
+    <View style={[screenSafeArea, styles.container]}>
       <View style={styles.wrapperContainer}>
         <AppHeader />
         <SearchList autoFocus={focus === "true"} />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

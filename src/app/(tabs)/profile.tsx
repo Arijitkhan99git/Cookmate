@@ -1,5 +1,6 @@
 import AppHeader from "@/components/AppHeader";
 import { AppText } from "@/components/AppText";
+import { useScreenSafeArea } from "@/hooks/useScreenSafeArea";
 import { useAtom } from "jotai";
 import {
   Bandage,
@@ -22,9 +23,8 @@ import {
   StyleSheet,
   Switch,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeColors } from "../../../constants/color-pallette";
 import { useGenericShadow } from "../../../constants/genericShadowStyle";
 import { fonts } from "../../../constants/typography";
@@ -350,6 +350,8 @@ export default function Profile() {
   const [theme, setTheme] = useAtom(themeAtom);
   const isDark = colors.isDarkMode;
 
+  const screenSafeArea = useScreenSafeArea();
+
   const [cookAlerts, setCookAlerts] = useState(true);
   const [measureUnit, setMeasureUnit] = useState<"metric" | "imperial">(
     "metric",
@@ -365,7 +367,7 @@ export default function Profile() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={screenSafeArea}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 110 }}
@@ -678,6 +680,6 @@ export default function Profile() {
         visible={helpModalVisible}
         onClose={() => setHelpModalVisible(false)}
       />
-    </SafeAreaView>
+    </View>
   );
 }

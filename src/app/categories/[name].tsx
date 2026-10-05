@@ -1,5 +1,6 @@
 import { AppText } from "@/components/AppText";
 import ErrorState from "@/components/ErrorState";
+import { useScreenSafeArea } from "@/hooks/useScreenSafeArea";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowLeft, UtensilsCrossed } from "lucide-react-native";
@@ -11,7 +12,6 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useFetchMealsByCategory } from "../../../api/hooks/UseFetchMealsByCategory";
 import { CategoryMeal } from "../../../api/model/listMealsByCategory";
 import { useThemeColors } from "../../../constants/color-pallette";
@@ -118,6 +118,7 @@ export default function CategoryMealsScreen() {
     thumb?: string;
   }>();
 
+  const screenSafeArea = useScreenSafeArea();
   const { background, primary } = useThemeColors();
 
   const { data, isLoading, isError, refetch, isRefetching } =
@@ -142,9 +143,8 @@ export default function CategoryMealsScreen() {
       onBack={handleBack}
     />
   );
-
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: background }]}>
+    <View style={screenSafeArea}>
       {isLoading ? (
         <View style={styles.flex}>
           {/* Render header even in loading so the nav bar is always visible */}
@@ -181,7 +181,7 @@ export default function CategoryMealsScreen() {
           windowSize={6}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
